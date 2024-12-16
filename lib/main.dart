@@ -1,11 +1,31 @@
-// Openapi Generator last run: : 2024-12-16T07:38:42.226111
+// Openapi Generator last run: : 2024-12-16T13:42:08.248089
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
-import 'package:praca_inzynierska_front/presentation/pages/login_page.dart';
+import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
+import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/signin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/signup_page.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'data/auth_storage.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final authStorage = AuthStorage();
+  final token = await authStorage.getToken();
+
+  final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final bearerAuthInterceptor = BearerAuthInterceptor();
+  dio.interceptors.add(bearerAuthInterceptor);
+
+  if (token != null && token.isNotEmpty) {
+    bearerAuthInterceptor.tokens['bearerAuth'] = token;
+  }
+
+  runApp(MyApp(
+    initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
+    dio: dio,
+  ));
 }
 
 @Openapi(
@@ -17,16 +37,20 @@ void main() {
   outputDirectory: 'api/praca_inzynierska_api',
 )
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  final Dio dio;
+
+  const MyApp({super.key, required this.initialRoute, required this.dio});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Aplikacja Uwierzytelniania',
-      initialRoute: '/login',
+      initialRoute: initialRoute,
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignUpPage(),
+        '/signin': (context) => SignInPage(dio: dio),
+        '/signup': (context) => SignUpPage(dio: dio),
+        '/games': (context) => GamesPage(dio: dio),
       },
     );
   }

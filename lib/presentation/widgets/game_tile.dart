@@ -3,12 +3,10 @@ import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
 class GameTile extends StatelessWidget {
   final SteamGame game;
-
   const GameTile({Key? key, required this.game}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // W przyszłości możesz tutaj dodać np. obrazek: Image.network(gameImageUrl)
     return Card(
       elevation: 2,
       child: Padding(
@@ -16,7 +14,6 @@ class GameTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Placeholder dla obrazka
             Container(
               height: 80,
               width: double.infinity,

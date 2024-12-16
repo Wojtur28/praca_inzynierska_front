@@ -10,14 +10,12 @@ class _$Category extends Category {
   @override
   final String? id;
   @override
-  final String? test;
-  @override
   final String? name;
 
   factory _$Category([void Function(CategoryBuilder)? updates]) =>
       (new CategoryBuilder()..update(updates))._build();
 
-  _$Category._({this.id, this.test, this.name}) : super._();
+  _$Category._({this.id, this.name}) : super._();
 
   @override
   Category rebuild(void Function(CategoryBuilder) updates) =>
@@ -29,17 +27,13 @@ class _$Category extends Category {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Category &&
-        id == other.id &&
-        test == other.test &&
-        name == other.name;
+    return other is Category && id == other.id && name == other.name;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, test.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -49,7 +43,6 @@ class _$Category extends Category {
   String toString() {
     return (newBuiltValueToStringHelper(r'Category')
           ..add('id', id)
-          ..add('test', test)
           ..add('name', name))
         .toString();
   }
@@ -61,10 +54,6 @@ class CategoryBuilder implements Builder<Category, CategoryBuilder> {
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
-
-  String? _test;
-  String? get test => _$this._test;
-  set test(String? test) => _$this._test = test;
 
   String? _name;
   String? get name => _$this._name;
@@ -78,7 +67,6 @@ class CategoryBuilder implements Builder<Category, CategoryBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _test = $v.test;
       _name = $v.name;
       _$v = null;
     }
@@ -100,7 +88,7 @@ class CategoryBuilder implements Builder<Category, CategoryBuilder> {
   Category build() => _build();
 
   _$Category _build() {
-    final _$result = _$v ?? new _$Category._(id: id, test: test, name: name);
+    final _$result = _$v ?? new _$Category._(id: id, name: name);
     replace(_$result);
     return _$result;
   }

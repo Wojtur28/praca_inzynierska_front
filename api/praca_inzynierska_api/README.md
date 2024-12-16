@@ -70,6 +70,7 @@ Class | Method | HTTP request | Description
 [*GameRatingsApi*](doc/GameRatingsApi.md) | [**getGameRatings**](doc/GameRatingsApi.md#getgameratings) | **GET** /games/{gameId}/ratings | Retrieve paginated game ratings for a specific Steam game
 [*SteamGamesApi*](doc/SteamGamesApi.md) | [**getSteamGameDetail**](doc/SteamGamesApi.md#getsteamgamedetail) | **GET** /games/{gameId}/detail | Retrieve Steam game details for a specific game
 [*SteamGamesApi*](doc/SteamGamesApi.md) | [**getSteamGames**](doc/SteamGamesApi.md#getsteamgames) | **GET** /games | Retrieve paginated list of Steam games
+[*SteamGamesApi*](doc/SteamGamesApi.md) | [**getSteamGamesWithDetails**](doc/SteamGamesApi.md#getsteamgameswithdetails) | **GET** /games/details | Retrieve paginated list of Steam games with details
 [*SteamReviewsApi*](doc/SteamReviewsApi.md) | [**getGameReviews**](doc/SteamReviewsApi.md#getgamereviews) | **GET** /games/{gameId}/reviews | Retrieve paginated reviews for a specific game
 
 
@@ -82,6 +83,7 @@ Class | Method | HTTP request | Description
  - [Platform](doc/Platform.md)
  - [SteamGame](doc/SteamGame.md)
  - [SteamGameDetail](doc/SteamGameDetail.md)
+ - [SteamGameWithDetails](doc/SteamGameWithDetails.md)
  - [SteamReview](doc/SteamReview.md)
  - [SteamUser](doc/SteamUser.md)
  - [User](doc/User.md)

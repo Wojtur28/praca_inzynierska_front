@@ -21,8 +21,8 @@ part 'steam_game.g.dart';
 /// * [launchPrice] - Launch price of the game.
 /// * [tags] - Tags associated with the game, stored as a comma-separated string.
 /// * [steamPage] - URL to the game's Steam page.
-@BuiltValue()
-abstract class SteamGame implements Built<SteamGame, SteamGameBuilder> {
+@BuiltValue(instantiable: false)
+abstract class SteamGame {
   /// Unique identifier of the Steam game.
   @BuiltValueField(wireName: r'id')
   String? get id;
@@ -59,20 +59,13 @@ abstract class SteamGame implements Built<SteamGame, SteamGameBuilder> {
   @BuiltValueField(wireName: r'steamPage')
   String? get steamPage;
 
-  SteamGame._();
-
-  factory SteamGame([void updates(SteamGameBuilder b)]) = _$SteamGame;
-
-  @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(SteamGameBuilder b) => b;
-
   @BuiltValueSerializer(custom: true)
   static Serializer<SteamGame> get serializer => _$SteamGameSerializer();
 }
 
 class _$SteamGameSerializer implements PrimitiveSerializer<SteamGame> {
   @override
-  final Iterable<Type> types = const [SteamGame, _$SteamGame];
+  final Iterable<Type> types = const [SteamGame];
 
   @override
   final String wireName = r'SteamGame';
@@ -156,6 +149,49 @@ class _$SteamGameSerializer implements PrimitiveSerializer<SteamGame> {
     return _serializeProperties(serializers, object,
             specifiedType: specifiedType)
         .toList();
+  }
+
+  @override
+  SteamGame deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    return serializers.deserialize(serialized,
+        specifiedType: FullType($SteamGame)) as $SteamGame;
+  }
+}
+
+/// a concrete implementation of [SteamGame], since [SteamGame] is not instantiable
+@BuiltValue(instantiable: true)
+abstract class $SteamGame
+    implements SteamGame, Built<$SteamGame, $SteamGameBuilder> {
+  $SteamGame._();
+
+  factory $SteamGame([void Function($SteamGameBuilder)? updates]) =
+      _$$SteamGame;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _defaults($SteamGameBuilder b) => b;
+
+  @BuiltValueSerializer(custom: true)
+  static Serializer<$SteamGame> get serializer => _$$SteamGameSerializer();
+}
+
+class _$$SteamGameSerializer implements PrimitiveSerializer<$SteamGame> {
+  @override
+  final Iterable<Type> types = const [$SteamGame, _$$SteamGame];
+
+  @override
+  final String wireName = r'$SteamGame';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    $SteamGame object, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    return serializers.serialize(object, specifiedType: FullType(SteamGame))!;
   }
 
   void _deserializeProperties(
@@ -242,12 +278,12 @@ class _$SteamGameSerializer implements PrimitiveSerializer<SteamGame> {
   }
 
   @override
-  SteamGame deserialize(
+  $SteamGame deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = SteamGameBuilder();
+    final result = $SteamGameBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

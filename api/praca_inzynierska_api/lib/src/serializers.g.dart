@@ -7,13 +7,14 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add($SteamGame.serializer)
       ..add(Category.serializer)
       ..add(CreateGameRating.serializer)
       ..add(GameRating.serializer)
       ..add(Genre.serializer)
       ..add(Platform.serializer)
-      ..add(SteamGame.serializer)
       ..add(SteamGameDetail.serializer)
+      ..add(SteamGameWithDetails.serializer)
       ..add(SteamReview.serializer)
       ..add(SteamUser.serializer)
       ..add(User.serializer)
@@ -23,6 +24,15 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(Genre)]),
           () => new ListBuilder<Genre>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Platform)]),
+          () => new ListBuilder<Platform>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Genre)]),
+          () => new ListBuilder<Genre>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Category)]),
+          () => new ListBuilder<Category>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(Platform)]),
           () => new ListBuilder<Platform>())

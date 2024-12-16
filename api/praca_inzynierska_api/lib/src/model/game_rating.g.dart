@@ -90,10 +90,9 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  SteamGameBuilder? _steamGame;
-  SteamGameBuilder get steamGame =>
-      _$this._steamGame ??= new SteamGameBuilder();
-  set steamGame(SteamGameBuilder? steamGame) => _$this._steamGame = steamGame;
+  SteamGame? _steamGame;
+  SteamGame? get steamGame => _$this._steamGame;
+  set steamGame(SteamGame? steamGame) => _$this._steamGame = steamGame;
 
   UserBuilder? _user;
   UserBuilder get user => _$this._user ??= new UserBuilder();
@@ -123,7 +122,7 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _steamGame = $v.steamGame?.toBuilder();
+      _steamGame = $v.steamGame;
       _user = $v.user?.toBuilder();
       _rating = $v.rating;
       _content = $v.content;
@@ -154,7 +153,7 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
       _$result = _$v ??
           new _$GameRating._(
               id: id,
-              steamGame: _steamGame?.build(),
+              steamGame: steamGame,
               user: _user?.build(),
               rating: rating,
               content: content,
@@ -163,8 +162,6 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'steamGame';
-        _steamGame?.build();
         _$failedField = 'user';
         _user?.build();
       } catch (e) {

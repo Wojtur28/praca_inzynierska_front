@@ -25,6 +25,8 @@ paths:
       operationId: getSteamGames
       tags:
         - SteamGames
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: page
           in: query
@@ -54,6 +56,8 @@ paths:
       operationId: getGameRatings
       tags:
         - GameRatings
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: gameId
           in: path
@@ -92,6 +96,8 @@ paths:
       operationId: createGameRating
       tags:
         - GameRatings
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: gameId
           in: path
@@ -123,6 +129,8 @@ paths:
       operationId: getGameReviews
       tags:
         - SteamReviews
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: gameId
           in: path
@@ -159,6 +167,8 @@ paths:
       operationId: getSteamGameDetail
       tags:
         - SteamGames
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: gameId
           in: path
@@ -176,6 +186,42 @@ paths:
                 $ref: '#/components/schemas/SteamGameDetail'
         '404':
           description: Steam game not found
+  /games/details:
+    get:
+      summary: Retrieve paginated list of Steam games with details
+      operationId: getSteamGamesWithDetails
+      tags:
+        - SteamGames
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: platform
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Filter games by platform
+      responses:
+        '200':
+          description: Paginated list of Steam games with details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SteamGameWithDetails'
 
 
 components:
@@ -290,8 +336,6 @@ components:
           type: string
           format: uuid
           description: Unique identifier of the category.
-        test:
-          type: string
         name:
           type: string
           description: Name of the category.
@@ -422,3 +466,47 @@ components:
           type: string
           description: User's review content.
           example: "Great game!"
+
+    SteamGameWithDetails:
+      allOf:
+        - $ref: '#/components/schemas/SteamGame'
+        - type: object
+          properties:
+            detailId:
+              type: string
+              format: uuid
+              description: Unique identifier of the Steam game details.
+            headerImage:
+              type: string
+              description: URL to the header image of the game.
+            capsuleImage:
+              type: string
+              description: URL to the capsule image of the game.
+            developer:
+              type: string
+              description: Developer of the game.
+            publisher:
+              type: string
+              description: Publisher of the game.
+            requiredAge:
+              type: integer
+              description: Required age to play the game.
+              example: 18
+            supportedLanguages:
+              type: string
+              description: Comma-separated list of supported languages for the game.
+            categories:
+              type: array
+              description: List of categories associated with the game.
+              items:
+                $ref: '#/components/schemas/Category'
+            genres:
+              type: array
+              description: List of genres associated with the game.
+              items:
+                $ref: '#/components/schemas/Genre'
+            platforms:
+              type: array
+              description: List of platforms supported by the game.
+              items:
+                $ref: '#/components/schemas/Platform'

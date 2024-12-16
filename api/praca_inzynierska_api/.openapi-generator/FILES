@@ -9,6 +9,7 @@ doc/Genre.md
 doc/Platform.md
 doc/SteamGame.md
 doc/SteamGameDetail.md
+doc/SteamGameWithDetails.md
 doc/SteamGamesApi.md
 doc/SteamReview.md
 doc/SteamReviewsApi.md
@@ -34,6 +35,7 @@ lib/src/model/genre.dart
 lib/src/model/platform.dart
 lib/src/model/steam_game.dart
 lib/src/model/steam_game_detail.dart
+lib/src/model/steam_game_with_details.dart
 lib/src/model/steam_review.dart
 lib/src/model/steam_user.dart
 lib/src/model/user.dart
