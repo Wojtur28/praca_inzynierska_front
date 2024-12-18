@@ -99,7 +99,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getSteamGamesWithDetails**
-> BuiltList<SteamGameWithDetails> getSteamGamesWithDetails(page, size, platform)
+> BuiltList<SteamGameWithDetails> getSteamGamesWithDetails(page, size, platform, categories, genres)
 
 Retrieve paginated list of Steam games with details
 
@@ -111,9 +111,11 @@ final api = PracaInzynierskaApi().getSteamGamesApi();
 final int page = 56; // int | 
 final int size = 56; // int | 
 final String platform = platform_example; // String | 
+final BuiltList<String> categories = ; // BuiltList<String> | 
+final BuiltList<String> genres = ; // BuiltList<String> | 
 
 try {
-    final response = api.getSteamGamesWithDetails(page, size, platform);
+    final response = api.getSteamGamesWithDetails(page, size, platform, categories, genres);
     print(response);
 } catch on DioException (e) {
     print('Exception when calling SteamGamesApi->getSteamGamesWithDetails: $e\n');
@@ -127,6 +129,8 @@ Name | Type | Description  | Notes
  **page** | **int**|  | [optional] [default to 0]
  **size** | **int**|  | [optional] [default to 10]
  **platform** | **String**|  | [optional] 
+ **categories** | [**BuiltList&lt;String&gt;**](String.md)|  | [optional] 
+ **genres** | [**BuiltList&lt;String&gt;**](String.md)|  | [optional] 
 
 ### Return type
 

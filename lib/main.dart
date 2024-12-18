@@ -1,6 +1,5 @@
-// Openapi Generator last run: : 2024-12-16T13:42:08.248089
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
@@ -36,21 +35,38 @@ void main() async {
   runSourceGenOnOutput: true,
   outputDirectory: 'api/praca_inzynierska_api',
 )
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final String initialRoute;
   final Dio dio;
 
   const MyApp({super.key, required this.initialRoute, required this.dio});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  final ValueNotifier<ThemeMode> _themeNotifier = ValueNotifier(ThemeMode.light);
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Aplikacja Uwierzytelniania',
-      initialRoute: initialRoute,
-      routes: {
-        '/signin': (context) => SignInPage(dio: dio),
-        '/signup': (context) => SignUpPage(dio: dio),
-        '/games': (context) => GamesPage(dio: dio),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _themeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Aplikacja Uwierzytelniania',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeMode,
+          initialRoute: widget.initialRoute,
+          routes: {
+            '/signin': (context) => SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/signup': (context) => SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/games': (context) => GamesPage(dio: widget.dio, themeNotifier: _themeNotifier),
+          },
+        );
       },
     );
   }

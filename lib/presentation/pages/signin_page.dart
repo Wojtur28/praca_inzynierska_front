@@ -6,25 +6,20 @@ import '../../domain/models/sign_in_user.dart';
 
 class SignInPage extends StatefulWidget {
   final Dio dio;
-  const SignInPage({super.key, required this.dio});
+  final ValueNotifier<ThemeMode> themeNotifier;
+
+  const SignInPage({super.key, required this.dio, required this.themeNotifier});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<SignInPage> {
-  late AuthRepository _authRepository;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _authRepository = AuthRepository(widget.dio);
-  }
 
   Future<void> _signIn() async {
     setState(() {
@@ -32,12 +27,12 @@ class _SignInPageState extends State<SignInPage> {
       _errorMessage = null;
     });
 
-    final user = SignInUser(
-      email: _emailController.text,
-      password: _passwordController.text,
+    final success = await AuthRepository(widget.dio).signIn(
+      SignInUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ),
     );
-
-    final success = await _authRepository.signIn(user);
 
     setState(() {
       _isLoading = false;
@@ -57,36 +52,65 @@ class _SignInPageState extends State<SignInPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Zaloguj się'),
+        actions: [
+          IconButton(
+            icon: Icon(widget.themeNotifier.value == ThemeMode.light
+                ? Icons.dark_mode
+                : Icons.light_mode),
+            onPressed: () {
+              widget.themeNotifier.value =
+              widget.themeNotifier.value == ThemeMode.light
+                  ? ThemeMode.dark
+                  : ThemeMode.light;
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            if (_errorMessage != null)
-              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+      body: Center(
+        child: Card(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_errorMessage != null)
+                  Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(labelText: 'Email'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: TextField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(labelText: 'Hasło'),
+                    obscureText: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                  onPressed: _signIn,
+                  child: const Text('Zaloguj'),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/signup');
+                  },
+                  child: const Text('Nie masz konta? Zarejestruj się'),
+                ),
+              ],
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Hasło'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: _signIn,
-              child: const Text('Zaloguj'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signup');
-              },
-              child: const Text('Nie masz konta? Zarejestruj się'),
-            ),
-          ],
+          ),
         ),
       ),
     );

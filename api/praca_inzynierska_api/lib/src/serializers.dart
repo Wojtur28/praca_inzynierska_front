@@ -59,6 +59,10 @@ Serializers serializers = (_$serializers.toBuilder()
         const FullType(BuiltList, [FullType(SteamGameWithDetails)]),
         () => ListBuilder<SteamGameWithDetails>(),
       )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..add(SteamGame.serializer)
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

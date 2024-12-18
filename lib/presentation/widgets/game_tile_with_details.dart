@@ -15,7 +15,7 @@ class GameTileWithDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 10,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       child: Padding(
         padding: const EdgeInsets.all(6.0),
@@ -28,7 +28,7 @@ class GameTileWithDetails extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.network(
                   game.headerImage!,
-                  height: 215,
+                  height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
@@ -61,7 +61,7 @@ class GameTileWithDetails extends StatelessWidget {
             const SizedBox(height: 4),
 
             Text(
-              'Cena: ${game.launchPrice ?? 'N/A'}',
+              'Cena na premierę: \$${game.launchPrice ?? 'N/A'}',
               style: const TextStyle(fontSize: 12),
             ),
 

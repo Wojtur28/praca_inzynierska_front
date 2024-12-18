@@ -205,6 +205,8 @@ class SteamGamesApi {
   /// * [page]
   /// * [size]
   /// * [platform]
+  /// * [categories]
+  /// * [genres]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -218,6 +220,8 @@ class SteamGamesApi {
     int? page = 0,
     int? size = 10,
     String? platform,
+    BuiltList<String>? categories,
+    BuiltList<String>? genres,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -252,6 +256,20 @@ class SteamGamesApi {
       if (platform != null)
         r'platform': encodeQueryParameter(
             _serializers, platform, const FullType(String)),
+      if (categories != null)
+        r'categories': encodeCollectionQueryParameter<String>(
+          _serializers,
+          categories,
+          const FullType(BuiltList, [FullType(String)]),
+          format: ListFormat.multi,
+        ),
+      if (genres != null)
+        r'genres': encodeCollectionQueryParameter<String>(
+          _serializers,
+          genres,
+          const FullType(BuiltList, [FullType(String)]),
+          format: ListFormat.multi,
+        ),
     };
 
     final _response = await _dio.request<Object>(

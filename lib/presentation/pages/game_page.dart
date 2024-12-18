@@ -1,14 +1,16 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/domain/repositories/games_repository.dart';
 
-import '../widgets/game_tile_with_details.dart';
+import 'filter_options.dart';
 
 class GamesPage extends StatefulWidget {
   final Dio dio;
-  const GamesPage({super.key, required this.dio});
+  final ValueNotifier<ThemeMode> themeNotifier;
+
+  const GamesPage({Key? key, required this.dio, required this.themeNotifier}) : super(key: key);
 
   @override
   State<GamesPage> createState() => _GamesPageState();
@@ -21,22 +23,29 @@ class _GamesPageState extends State<GamesPage> {
   bool _hasMore = true;
   int _currentPage = 0;
   final int _pageSize = 10;
-  final _scrollController = ScrollController();
-  String? _errorMessage;
+  final ScrollController _scrollController = ScrollController();
 
   String? _selectedPlatform;
-  final List<String> _platforms = ['PC', 'Xbox', 'PlayStation', 'Switch'];
+  List<String> _selectedCategories = [];
+  List<String> _selectedGenres = [];
 
   @override
   void initState() {
     super.initState();
     _gamesRepository = GamesRepository(widget.dio);
-    _scrollController.addListener(_onScroll);
     _fetchGames();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       if (!_isLoading && _hasMore) {
         _currentPage++;
         _fetchGames();
@@ -54,8 +63,9 @@ class _GamesPageState extends State<GamesPage> {
         page: _currentPage,
         size: _pageSize,
         platform: _selectedPlatform,
+        categories: _selectedCategories.isNotEmpty ? _selectedCategories : null,
+        genres: _selectedGenres.isNotEmpty ? _selectedGenres : null,
       );
-      print('Fetched ${newGames.length} games with details');
       setState(() {
         if (newGames.isEmpty) {
           _hasMore = false;
@@ -63,12 +73,10 @@ class _GamesPageState extends State<GamesPage> {
           _games = _games.rebuild((b) => b..addAll(newGames));
         }
       });
-      print('Total games now: ${_games.length}');
     } catch (e) {
-      print('Error fetching games with details: $e');
-      setState(() {
-        _errorMessage = 'Błąd podczas pobierania gier z detalami';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Błąd podczas pobierania gier: $e')),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -76,87 +84,200 @@ class _GamesPageState extends State<GamesPage> {
     }
   }
 
-  void _onPlatformChanged(String? newPlatform) {
-    setState(() {
-      _selectedPlatform = newPlatform;
-      _games = BuiltList<SteamGameWithDetails>();
-      _currentPage = 0;
-      _hasMore = true;
-    });
-    _fetchGames();
+  Widget _buildFilterBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onBackground,
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 8,
+        children: [
+          DropdownButton<String>(
+            value: _selectedPlatform,
+            hint: const Text('Platforma'),
+            items: platforms.map((platform) {
+              return DropdownMenuItem(value: platform, child: Text(platform));
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedPlatform = value;
+                _games = BuiltList<SteamGameWithDetails>();
+                _currentPage = 0;
+                _hasMore = true;
+                _fetchGames();
+              });
+            },
+          ),
+          DropdownButton<String>(
+            value: _selectedCategories.isNotEmpty ? _selectedCategories.first : null,
+            hint: const Text('Kategoria'),
+            items: allCategories.map((category) {
+              return DropdownMenuItem(value: category, child: Text(category));
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _selectedCategories = [value];
+                  _games = BuiltList<SteamGameWithDetails>();
+                  _currentPage = 0;
+                  _hasMore = true;
+                  _fetchGames();
+                });
+              }
+            },
+          ),
+          DropdownButton<String>(
+            value: _selectedGenres.isNotEmpty ? _selectedGenres.first : null,
+            hint: const Text('Gatunek'),
+            items: allGenres.map((genre) {
+              return DropdownMenuItem(value: genre, child: Text(genre));
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _selectedGenres = [value];
+                  _games = BuiltList<SteamGameWithDetails>();
+                  _currentPage = 0;
+                  _hasMore = true;
+                  _fetchGames();
+                });
+              }
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _selectedPlatform = null;
+                _selectedCategories.clear();
+                _selectedGenres.clear();
+                _games = BuiltList<SteamGameWithDetails>();
+                _currentPage = 0;
+                _hasMore = true;
+                _fetchGames();
+              });
+            },
+            child: const Text('Resetuj filtry'),
+          ),
+        ],
+      ),
+    );
   }
 
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
+
+  Widget _buildGameGrid() {
+    return GridView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.5,
+      ),
+      itemCount: _games.length + (_hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == _games.length) {
+          return _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : const SizedBox();
+        }
+        final game = _games[index];
+        return _buildGameCard(game);
+      },
+    );
+  }
+
+  Widget _buildGameCard(SteamGameWithDetails game) {
+    final categories = (game.categories?.map((c) => c.name).toList() ?? []).take(2).toList();
+    final genres = (game.genres?.map((g) => g.name).toList() ?? []).take(2).toList();
+
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Image.network(
+              game.headerImage ?? '',
+              height: 150,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.broken_image,
+                size: 50,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  game.title ?? 'Brak tytułu',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text('Cena: \$${game.launchPrice ?? 'N/A'}',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                Text(
+                  'Kategorie: ${categories.join(', ')}',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.visible,
+                ),
+                Text(
+                  'Gatunki: ${genres.join(', ')}',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.visible,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final games = _games;
-    print('Building UI with ${games.length} games with details');
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista Gier z Detalami'),
+        title: const Text('Gry'),
+        actions: [
+          IconButton(
+            icon: Icon(widget.themeNotifier.value == ThemeMode.light
+                ? Icons.dark_mode
+                : Icons.light_mode),
+            onPressed: () {
+              widget.themeNotifier.value =
+              widget.themeNotifier.value == ThemeMode.light
+                  ? ThemeMode.dark
+                  : ThemeMode.light;
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          children: [
-
-            Row(
-              children: [
-                const Text('Platforma: '),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    value: _selectedPlatform,
-                    hint: const Text('Wybierz platformę'),
-                    items: _platforms.map((platform) {
-                      return DropdownMenuItem(
-                        value: platform,
-                        child: Text(platform),
-                      );
-                    }).toList(),
-                    onChanged: _onPlatformChanged,
-                  ),
-                ),
-                if (_selectedPlatform != null)
-                  IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _onPlatformChanged(null);
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            if (_errorMessage != null)
-              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-            Expanded(
-              child: GridView.builder(
-                controller: _scrollController,
-                itemCount: games.length + (_hasMore ? 1 : 0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 12.0,
-                  mainAxisSpacing: 12.0,
-                  childAspectRatio: 0.6,
-                ),
-                itemBuilder: (context, index) {
-                  if (index == games.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final game = games[index];
-                  return GameTileWithDetails(game: game);
-                },
-              ),
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildFilterBar(),
+          Expanded(
+            child: _games.isEmpty && !_isLoading
+                ? const Center(child: Text('Brak wyników'))
+                : _buildGameGrid(),
+          ),
+        ],
       ),
     );
   }
