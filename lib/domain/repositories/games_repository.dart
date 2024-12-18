@@ -13,6 +13,7 @@ class GamesRepository {
     String? platform,
     List<String>? categories,
     List<String>? genres,
+    String? search,
   }) async {
     try {
       final response = await _steamGamesApi.getSteamGamesWithDetails(
@@ -21,10 +22,10 @@ class GamesRepository {
         platform: platform,
         categories: categories != null ? BuiltList<String>(categories) : null,
         genres: genres != null ? BuiltList<String>(genres) : null,
+        search: search,
       );
 
       if (response.statusCode == 200 && response.data != null) {
-
         return response.data!.toList();
       } else {
         throw Exception('Failed to load games with details');
@@ -33,4 +34,5 @@ class GamesRepository {
       throw Exception('Error fetching games with details: $e');
     }
   }
+
 }

@@ -229,6 +229,12 @@ paths:
             items:
               type: string
             description: Filter games by genres
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Search games by title
       responses:
         '200':
           description: Paginated list of Steam games with details

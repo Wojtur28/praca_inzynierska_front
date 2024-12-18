@@ -96,81 +96,106 @@ class _GamesPageState extends State<GamesPage> {
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 8,
+      child: Column(
         children: [
-          DropdownButton<String>(
-            value: _selectedPlatform,
-            hint: const Text('Platforma'),
-            items: platforms.map((platform) {
-              return DropdownMenuItem(value: platform, child: Text(platform));
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedPlatform = value;
-                _games = BuiltList<SteamGameWithDetails>();
-                _currentPage = 0;
-                _hasMore = true;
-                _fetchGames();
-              });
-            },
-          ),
-          DropdownButton<String>(
-            value: _selectedCategories.isNotEmpty ? _selectedCategories.first : null,
-            hint: const Text('Kategoria'),
-            items: allCategories.map((category) {
-              return DropdownMenuItem(value: category, child: Text(category));
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
+          TextField(
+            decoration: const InputDecoration(
+              labelText: 'Szukaj gier',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) async {
+              if (value.isNotEmpty) {
+                final suggestions = await _gamesRepository.fetchGamesWithDetails(
+                  search: value,
+                );
                 setState(() {
-                  _selectedCategories = [value];
+                  _games = BuiltList<SteamGameWithDetails>(suggestions);
+                });
+              } else {
+                setState(() {
                   _games = BuiltList<SteamGameWithDetails>();
-                  _currentPage = 0;
-                  _hasMore = true;
                   _fetchGames();
                 });
               }
             },
           ),
-          DropdownButton<String>(
-            value: _selectedGenres.isNotEmpty ? _selectedGenres.first : null,
-            hint: const Text('Gatunek'),
-            items: allGenres.map((genre) {
-              return DropdownMenuItem(value: genre, child: Text(genre));
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _selectedGenres = [value];
-                  _games = BuiltList<SteamGameWithDetails>();
-                  _currentPage = 0;
-                  _hasMore = true;
-                  _fetchGames();
-                });
-              }
-            },
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _selectedPlatform = null;
-                _selectedCategories.clear();
-                _selectedGenres.clear();
-                _games = BuiltList<SteamGameWithDetails>();
-                _currentPage = 0;
-                _hasMore = true;
-                _fetchGames();
-              });
-            },
-            child: const Text('Resetuj filtry'),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              DropdownButton<String>(
+                value: _selectedPlatform,
+                hint: const Text('Platforma'),
+                items: platforms.map((platform) {
+                  return DropdownMenuItem(value: platform, child: Text(platform));
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPlatform = value;
+                    _games = BuiltList<SteamGameWithDetails>();
+                    _currentPage = 0;
+                    _hasMore = true;
+                    _fetchGames();
+                  });
+                },
+              ),
+              DropdownButton<String>(
+                value: _selectedCategories.isNotEmpty ? _selectedCategories.first : null,
+                hint: const Text('Kategoria'),
+                items: allCategories.map((category) {
+                  return DropdownMenuItem(value: category, child: Text(category));
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedCategories = [value];
+                      _games = BuiltList<SteamGameWithDetails>();
+                      _currentPage = 0;
+                      _hasMore = true;
+                      _fetchGames();
+                    });
+                  }
+                },
+              ),
+              DropdownButton<String>(
+                value: _selectedGenres.isNotEmpty ? _selectedGenres.first : null,
+                hint: const Text('Gatunek'),
+                items: allGenres.map((genre) {
+                  return DropdownMenuItem(value: genre, child: Text(genre));
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedGenres = [value];
+                      _games = BuiltList<SteamGameWithDetails>();
+                      _currentPage = 0;
+                      _hasMore = true;
+                      _fetchGames();
+                    });
+                  }
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedPlatform = null;
+                    _selectedCategories.clear();
+                    _selectedGenres.clear();
+                    _games = BuiltList<SteamGameWithDetails>();
+                    _currentPage = 0;
+                    _hasMore = true;
+                    _fetchGames();
+                  });
+                },
+                child: const Text('Resetuj filtry'),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
 
   Widget _buildGameGrid() {
     return GridView.builder(

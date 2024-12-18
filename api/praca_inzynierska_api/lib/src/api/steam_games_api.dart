@@ -207,6 +207,7 @@ class SteamGamesApi {
   /// * [platform]
   /// * [categories]
   /// * [genres]
+  /// * [search]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -222,6 +223,7 @@ class SteamGamesApi {
     String? platform,
     BuiltList<String>? categories,
     BuiltList<String>? genres,
+    String? search,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -270,6 +272,9 @@ class SteamGamesApi {
           const FullType(BuiltList, [FullType(String)]),
           format: ListFormat.multi,
         ),
+      if (search != null)
+        r'search':
+            encodeQueryParameter(_serializers, search, const FullType(String)),
     };
 
     final _response = await _dio.request<Object>(
