@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/sign_in_user.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+class SignInForm extends StatefulWidget {
+  const SignInForm({Key? key}) : super(key: key);
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  _SignInFormState createState() => _SignInFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _SignInFormState extends State<SignInForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -44,7 +44,6 @@ class _LoginFormState extends State<LoginForm> {
                 email: _emailController.text,
                 password: _passwordController.text,
               );
-              // Wywołaj logikę signIn
             },
             child: const Text('Zaloguj się'),
           ),

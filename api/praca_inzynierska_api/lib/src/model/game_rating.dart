@@ -157,7 +157,7 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
             value,
             specifiedType: const FullType(SteamGame),
           ) as SteamGame;
-          result.steamGame.replace(valueDes);
+          result.steamGame = valueDes;
           break;
         case r'user':
           final valueDes = serializers.deserialize(

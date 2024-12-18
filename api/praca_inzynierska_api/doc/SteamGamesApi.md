@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getSteamGameDetail**](SteamGamesApi.md#getsteamgamedetail) | **GET** /games/{gameId}/detail | Retrieve Steam game details for a specific game
 [**getSteamGames**](SteamGamesApi.md#getsteamgames) | **GET** /games | Retrieve paginated list of Steam games
+[**getSteamGamesWithDetails**](SteamGamesApi.md#getsteamgameswithdetails) | **GET** /games/details | Retrieve paginated list of Steam games with details
 
 
 # **getSteamGameDetail**
@@ -45,7 +46,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 
@@ -88,7 +89,58 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getSteamGamesWithDetails**
+> BuiltList<SteamGameWithDetails> getSteamGamesWithDetails(page, size, platform, categories, genres, search)
+
+Retrieve paginated list of Steam games with details
+
+### Example
+```dart
+import 'package:praca_inzynierska_api/api.dart';
+
+final api = PracaInzynierskaApi().getSteamGamesApi();
+final int page = 56; // int | 
+final int size = 56; // int | 
+final String platform = platform_example; // String | 
+final BuiltList<String> categories = ; // BuiltList<String> | 
+final BuiltList<String> genres = ; // BuiltList<String> | 
+final String search = search_example; // String | 
+
+try {
+    final response = api.getSteamGamesWithDetails(page, size, platform, categories, genres, search);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling SteamGamesApi->getSteamGamesWithDetails: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional] [default to 0]
+ **size** | **int**|  | [optional] [default to 10]
+ **platform** | **String**|  | [optional] 
+ **categories** | [**BuiltList&lt;String&gt;**](String.md)|  | [optional] 
+ **genres** | [**BuiltList&lt;String&gt;**](String.md)|  | [optional] 
+ **search** | **String**|  | [optional] 
+
+### Return type
+
+[**BuiltList&lt;SteamGameWithDetails&gt;**](SteamGameWithDetails.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 

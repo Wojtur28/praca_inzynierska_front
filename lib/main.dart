@@ -1,11 +1,31 @@
-// Openapi Generator last run: : 2024-12-16T07:38:42.226111
+// Openapi Generator last run: : 2024-12-18T08:16:59.247785
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
-import 'package:praca_inzynierska_front/presentation/pages/login_page.dart';
+import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
+import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/signin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/signup_page.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'data/auth_storage.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final authStorage = AuthStorage();
+  final token = await authStorage.getToken();
+
+  final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+  final bearerAuthInterceptor = BearerAuthInterceptor();
+  dio.interceptors.add(bearerAuthInterceptor);
+
+  if (token != null && token.isNotEmpty) {
+    bearerAuthInterceptor.tokens['bearerAuth'] = token;
+  }
+
+  runApp(MyApp(
+    initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
+    dio: dio,
+  ));
 }
 
 @Openapi(
@@ -16,17 +36,38 @@ void main() {
   runSourceGenOnOutput: true,
   outputDirectory: 'api/praca_inzynierska_api',
 )
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final String initialRoute;
+  final Dio dio;
+
+  const MyApp({super.key, required this.initialRoute, required this.dio});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  final ValueNotifier<ThemeMode> _themeNotifier = ValueNotifier(ThemeMode.light);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Aplikacja Uwierzytelniania',
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignUpPage(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _themeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Aplikacja Uwierzytelniania',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeMode,
+          initialRoute: widget.initialRoute,
+          routes: {
+            '/signin': (context) => SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/signup': (context) => SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/games': (context) => GamesPage(dio: widget.dio, themeNotifier: _themeNotifier),
+          },
+        );
       },
     );
   }

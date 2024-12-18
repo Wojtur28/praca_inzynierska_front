@@ -6,7 +6,38 @@ part of 'steam_game.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$SteamGame extends SteamGame {
+abstract class SteamGameBuilder {
+  void replace(SteamGame other);
+  void update(void Function(SteamGameBuilder) updates);
+  String? get id;
+  set id(String? id);
+
+  int? get appId;
+  set appId(int? appId);
+
+  String? get title;
+  set title(String? title);
+
+  int? get reviewsTotal;
+  set reviewsTotal(int? reviewsTotal);
+
+  String? get reviewsScoreFancy;
+  set reviewsScoreFancy(String? reviewsScoreFancy);
+
+  Date? get releaseDate;
+  set releaseDate(Date? releaseDate);
+
+  String? get launchPrice;
+  set launchPrice(String? launchPrice);
+
+  String? get tags;
+  set tags(String? tags);
+
+  String? get steamPage;
+  set steamPage(String? steamPage);
+}
+
+class _$$SteamGame extends $SteamGame {
   @override
   final String? id;
   @override
@@ -26,10 +57,10 @@ class _$SteamGame extends SteamGame {
   @override
   final String? steamPage;
 
-  factory _$SteamGame([void Function(SteamGameBuilder)? updates]) =>
-      (new SteamGameBuilder()..update(updates))._build();
+  factory _$$SteamGame([void Function($SteamGameBuilder)? updates]) =>
+      (new $SteamGameBuilder()..update(updates))._build();
 
-  _$SteamGame._(
+  _$$SteamGame._(
       {this.id,
       this.appId,
       this.title,
@@ -42,16 +73,16 @@ class _$SteamGame extends SteamGame {
       : super._();
 
   @override
-  SteamGame rebuild(void Function(SteamGameBuilder) updates) =>
+  $SteamGame rebuild(void Function($SteamGameBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  SteamGameBuilder toBuilder() => new SteamGameBuilder()..replace(this);
+  $SteamGameBuilder toBuilder() => new $SteamGameBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is SteamGame &&
+    return other is $SteamGame &&
         id == other.id &&
         appId == other.appId &&
         title == other.title &&
@@ -81,7 +112,7 @@ class _$SteamGame extends SteamGame {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'SteamGame')
+    return (newBuiltValueToStringHelper(r'$SteamGame')
           ..add('id', id)
           ..add('appId', appId)
           ..add('title', title)
@@ -95,51 +126,55 @@ class _$SteamGame extends SteamGame {
   }
 }
 
-class SteamGameBuilder implements Builder<SteamGame, SteamGameBuilder> {
-  _$SteamGame? _$v;
+class $SteamGameBuilder
+    implements Builder<$SteamGame, $SteamGameBuilder>, SteamGameBuilder {
+  _$$SteamGame? _$v;
 
   String? _id;
   String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  set id(covariant String? id) => _$this._id = id;
 
   int? _appId;
   int? get appId => _$this._appId;
-  set appId(int? appId) => _$this._appId = appId;
+  set appId(covariant int? appId) => _$this._appId = appId;
 
   String? _title;
   String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
+  set title(covariant String? title) => _$this._title = title;
 
   int? _reviewsTotal;
   int? get reviewsTotal => _$this._reviewsTotal;
-  set reviewsTotal(int? reviewsTotal) => _$this._reviewsTotal = reviewsTotal;
+  set reviewsTotal(covariant int? reviewsTotal) =>
+      _$this._reviewsTotal = reviewsTotal;
 
   String? _reviewsScoreFancy;
   String? get reviewsScoreFancy => _$this._reviewsScoreFancy;
-  set reviewsScoreFancy(String? reviewsScoreFancy) =>
+  set reviewsScoreFancy(covariant String? reviewsScoreFancy) =>
       _$this._reviewsScoreFancy = reviewsScoreFancy;
 
   Date? _releaseDate;
   Date? get releaseDate => _$this._releaseDate;
-  set releaseDate(Date? releaseDate) => _$this._releaseDate = releaseDate;
+  set releaseDate(covariant Date? releaseDate) =>
+      _$this._releaseDate = releaseDate;
 
   String? _launchPrice;
   String? get launchPrice => _$this._launchPrice;
-  set launchPrice(String? launchPrice) => _$this._launchPrice = launchPrice;
+  set launchPrice(covariant String? launchPrice) =>
+      _$this._launchPrice = launchPrice;
 
   String? _tags;
   String? get tags => _$this._tags;
-  set tags(String? tags) => _$this._tags = tags;
+  set tags(covariant String? tags) => _$this._tags = tags;
 
   String? _steamPage;
   String? get steamPage => _$this._steamPage;
-  set steamPage(String? steamPage) => _$this._steamPage = steamPage;
+  set steamPage(covariant String? steamPage) => _$this._steamPage = steamPage;
 
-  SteamGameBuilder() {
-    SteamGame._defaults(this);
+  $SteamGameBuilder() {
+    $SteamGame._defaults(this);
   }
 
-  SteamGameBuilder get _$this {
+  $SteamGameBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
@@ -157,22 +192,22 @@ class SteamGameBuilder implements Builder<SteamGame, SteamGameBuilder> {
   }
 
   @override
-  void replace(SteamGame other) {
+  void replace(covariant $SteamGame other) {
     ArgumentError.checkNotNull(other, 'other');
-    _$v = other as _$SteamGame;
+    _$v = other as _$$SteamGame;
   }
 
   @override
-  void update(void Function(SteamGameBuilder)? updates) {
+  void update(void Function($SteamGameBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  SteamGame build() => _build();
+  $SteamGame build() => _build();
 
-  _$SteamGame _build() {
+  _$$SteamGame _build() {
     final _$result = _$v ??
-        new _$SteamGame._(
+        new _$$SteamGame._(
             id: id,
             appId: appId,
             title: title,

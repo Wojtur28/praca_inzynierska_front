@@ -21,6 +21,7 @@ import 'package:praca_inzynierska_api/src/model/genre.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';
+import 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 import 'package:praca_inzynierska_api/src/model/steam_review.dart';
 import 'package:praca_inzynierska_api/src/model/steam_user.dart';
 import 'package:praca_inzynierska_api/src/model/user.dart';
@@ -34,7 +35,9 @@ part 'serializers.g.dart';
   Genre,
   Platform,
   SteamGame,
+  $SteamGame,
   SteamGameDetail,
+  SteamGameWithDetails,
   SteamReview,
   SteamUser,
   User,
@@ -52,6 +55,15 @@ Serializers serializers = (_$serializers.toBuilder()
         const FullType(BuiltList, [FullType(SteamGame)]),
         () => ListBuilder<SteamGame>(),
       )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(SteamGameWithDetails)]),
+        () => ListBuilder<SteamGameWithDetails>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..add(SteamGame.serializer)
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())
       ..add(const DateSerializer())
