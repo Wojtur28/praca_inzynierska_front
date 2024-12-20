@@ -4,7 +4,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/domain/repositories/games_repository.dart';
 
-import 'filter_options.dart';
+import '../../data/filter_options.dart';
 
 class GamesPage extends StatefulWidget {
   final Dio dio;
