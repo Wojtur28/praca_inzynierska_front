@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
-import 'package:praca_inzynierska_front/presentation/pages/signin_page.dart';
-import 'package:praca_inzynierska_front/presentation/pages/signup_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
 
 import 'data/auth_storage.dart';
 
