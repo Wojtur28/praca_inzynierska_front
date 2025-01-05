@@ -4,7 +4,7 @@ import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 class GameTileWithDetails extends StatelessWidget {
   final SteamGameWithDetails game;
 
-  const GameTileWithDetails({Key? key, required this.game}) : super(key: key);
+  const GameTileWithDetails({super.key, required this.game});
 
   String _formatReleaseDate(Date? date) {
     if (date == null) return 'N/A';

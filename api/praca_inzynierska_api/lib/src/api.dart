@@ -9,6 +9,7 @@ import 'package:praca_inzynierska_api/src/auth/api_key_auth.dart';
 import 'package:praca_inzynierska_api/src/auth/basic_auth.dart';
 import 'package:praca_inzynierska_api/src/auth/bearer_auth.dart';
 import 'package:praca_inzynierska_api/src/auth/oauth.dart';
+import 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 import 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
@@ -76,6 +77,12 @@ class PracaInzynierskaApi {
               as ApiKeyAuthInterceptor)
           .apiKeys[name] = apiKey;
     }
+  }
+
+  /// Get GameRatingAnswersApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  GameRatingAnswersApi getGameRatingAnswersApi() {
+    return GameRatingAnswersApi(dio, serializers);
   }
 
   /// Get GameRatingsApi instance, base route and serializer can be overridden by a given but be careful,

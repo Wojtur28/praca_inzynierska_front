@@ -6,57 +6,49 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'create_game_rating.g.dart';
+part 'create_game_rating_answer.g.dart';
 
-/// CreateGameRating
+/// CreateGameRatingAnswer
 ///
 /// Properties:
-/// * [rating] - Rating score (1-10).
-/// * [content] - User's review content.
+/// * [content] - Content of the answer.
 @BuiltValue()
-abstract class CreateGameRating
-    implements Built<CreateGameRating, CreateGameRatingBuilder> {
-  /// Rating score (1-10).
-  @BuiltValueField(wireName: r'rating')
-  int? get rating;
-
-  /// User's review content.
+abstract class CreateGameRatingAnswer
+    implements Built<CreateGameRatingAnswer, CreateGameRatingAnswerBuilder> {
+  /// Content of the answer.
   @BuiltValueField(wireName: r'content')
   String? get content;
 
-  CreateGameRating._();
+  CreateGameRatingAnswer._();
 
-  factory CreateGameRating([void updates(CreateGameRatingBuilder b)]) =
-      _$CreateGameRating;
+  factory CreateGameRatingAnswer(
+          [void updates(CreateGameRatingAnswerBuilder b)]) =
+      _$CreateGameRatingAnswer;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(CreateGameRatingBuilder b) => b;
+  static void _defaults(CreateGameRatingAnswerBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<CreateGameRating> get serializer =>
-      _$CreateGameRatingSerializer();
+  static Serializer<CreateGameRatingAnswer> get serializer =>
+      _$CreateGameRatingAnswerSerializer();
 }
 
-class _$CreateGameRatingSerializer
-    implements PrimitiveSerializer<CreateGameRating> {
+class _$CreateGameRatingAnswerSerializer
+    implements PrimitiveSerializer<CreateGameRatingAnswer> {
   @override
-  final Iterable<Type> types = const [CreateGameRating, _$CreateGameRating];
+  final Iterable<Type> types = const [
+    CreateGameRatingAnswer,
+    _$CreateGameRatingAnswer
+  ];
 
   @override
-  final String wireName = r'CreateGameRating';
+  final String wireName = r'CreateGameRatingAnswer';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    CreateGameRating object, {
+    CreateGameRatingAnswer object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    if (object.rating != null) {
-      yield r'rating';
-      yield serializers.serialize(
-        object.rating,
-        specifiedType: const FullType(int),
-      );
-    }
     if (object.content != null) {
       yield r'content';
       yield serializers.serialize(
@@ -69,7 +61,7 @@ class _$CreateGameRatingSerializer
   @override
   Object serialize(
     Serializers serializers,
-    CreateGameRating object, {
+    CreateGameRatingAnswer object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -82,20 +74,13 @@ class _$CreateGameRatingSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required CreateGameRatingBuilder result,
+    required CreateGameRatingAnswerBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'rating':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.rating = valueDes;
-          break;
         case r'content':
           final valueDes = serializers.deserialize(
             value,
@@ -112,12 +97,12 @@ class _$CreateGameRatingSerializer
   }
 
   @override
-  CreateGameRating deserialize(
+  CreateGameRatingAnswer deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = CreateGameRatingBuilder();
+    final result = CreateGameRatingAnswerBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

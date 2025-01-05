@@ -8,10 +8,6 @@ part of 'create_game_rating.dart';
 
 class _$CreateGameRating extends CreateGameRating {
   @override
-  final String? steamGameId;
-  @override
-  final String? userId;
-  @override
   final int? rating;
   @override
   final String? content;
@@ -20,9 +16,7 @@ class _$CreateGameRating extends CreateGameRating {
           [void Function(CreateGameRatingBuilder)? updates]) =>
       (new CreateGameRatingBuilder()..update(updates))._build();
 
-  _$CreateGameRating._(
-      {this.steamGameId, this.userId, this.rating, this.content})
-      : super._();
+  _$CreateGameRating._({this.rating, this.content}) : super._();
 
   @override
   CreateGameRating rebuild(void Function(CreateGameRatingBuilder) updates) =>
@@ -36,8 +30,6 @@ class _$CreateGameRating extends CreateGameRating {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is CreateGameRating &&
-        steamGameId == other.steamGameId &&
-        userId == other.userId &&
         rating == other.rating &&
         content == other.content;
   }
@@ -45,8 +37,6 @@ class _$CreateGameRating extends CreateGameRating {
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, steamGameId.hashCode);
-    _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jc(_$hash, rating.hashCode);
     _$hash = $jc(_$hash, content.hashCode);
     _$hash = $jf(_$hash);
@@ -56,8 +46,6 @@ class _$CreateGameRating extends CreateGameRating {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateGameRating')
-          ..add('steamGameId', steamGameId)
-          ..add('userId', userId)
           ..add('rating', rating)
           ..add('content', content))
         .toString();
@@ -67,14 +55,6 @@ class _$CreateGameRating extends CreateGameRating {
 class CreateGameRatingBuilder
     implements Builder<CreateGameRating, CreateGameRatingBuilder> {
   _$CreateGameRating? _$v;
-
-  String? _steamGameId;
-  String? get steamGameId => _$this._steamGameId;
-  set steamGameId(String? steamGameId) => _$this._steamGameId = steamGameId;
-
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
 
   int? _rating;
   int? get rating => _$this._rating;
@@ -91,8 +71,6 @@ class CreateGameRatingBuilder
   CreateGameRatingBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _steamGameId = $v.steamGameId;
-      _userId = $v.userId;
       _rating = $v.rating;
       _content = $v.content;
       _$v = null;
@@ -115,12 +93,8 @@ class CreateGameRatingBuilder
   CreateGameRating build() => _build();
 
   _$CreateGameRating _build() {
-    final _$result = _$v ??
-        new _$CreateGameRating._(
-            steamGameId: steamGameId,
-            userId: userId,
-            rating: rating,
-            content: content);
+    final _$result =
+        _$v ?? new _$CreateGameRating._(rating: rating, content: content);
     replace(_$result);
     return _$result;
   }

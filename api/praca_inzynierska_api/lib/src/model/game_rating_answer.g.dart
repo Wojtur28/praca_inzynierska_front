@@ -1,20 +1,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'game_rating.dart';
+part of 'game_rating_answer.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$GameRating extends GameRating {
+class _$GameRatingAnswer extends GameRatingAnswer {
   @override
   final String? id;
   @override
-  final SteamGame? steamGame;
+  final GameRating? gameRating;
   @override
   final User? user;
-  @override
-  final int? rating;
   @override
   final String? content;
   @override
@@ -24,14 +22,14 @@ class _$GameRating extends GameRating {
   @override
   final DateTime? createdAt;
 
-  factory _$GameRating([void Function(GameRatingBuilder)? updates]) =>
-      (new GameRatingBuilder()..update(updates))._build();
+  factory _$GameRatingAnswer(
+          [void Function(GameRatingAnswerBuilder)? updates]) =>
+      (new GameRatingAnswerBuilder()..update(updates))._build();
 
-  _$GameRating._(
+  _$GameRatingAnswer._(
       {this.id,
-      this.steamGame,
+      this.gameRating,
       this.user,
-      this.rating,
       this.content,
       this.votesUp,
       this.votesDown,
@@ -39,20 +37,20 @@ class _$GameRating extends GameRating {
       : super._();
 
   @override
-  GameRating rebuild(void Function(GameRatingBuilder) updates) =>
+  GameRatingAnswer rebuild(void Function(GameRatingAnswerBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  GameRatingBuilder toBuilder() => new GameRatingBuilder()..replace(this);
+  GameRatingAnswerBuilder toBuilder() =>
+      new GameRatingAnswerBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is GameRating &&
+    return other is GameRatingAnswer &&
         id == other.id &&
-        steamGame == other.steamGame &&
+        gameRating == other.gameRating &&
         user == other.user &&
-        rating == other.rating &&
         content == other.content &&
         votesUp == other.votesUp &&
         votesDown == other.votesDown &&
@@ -63,9 +61,8 @@ class _$GameRating extends GameRating {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, steamGame.hashCode);
+    _$hash = $jc(_$hash, gameRating.hashCode);
     _$hash = $jc(_$hash, user.hashCode);
-    _$hash = $jc(_$hash, rating.hashCode);
     _$hash = $jc(_$hash, content.hashCode);
     _$hash = $jc(_$hash, votesUp.hashCode);
     _$hash = $jc(_$hash, votesDown.hashCode);
@@ -76,11 +73,10 @@ class _$GameRating extends GameRating {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'GameRating')
+    return (newBuiltValueToStringHelper(r'GameRatingAnswer')
           ..add('id', id)
-          ..add('steamGame', steamGame)
+          ..add('gameRating', gameRating)
           ..add('user', user)
-          ..add('rating', rating)
           ..add('content', content)
           ..add('votesUp', votesUp)
           ..add('votesDown', votesDown)
@@ -89,24 +85,23 @@ class _$GameRating extends GameRating {
   }
 }
 
-class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
-  _$GameRating? _$v;
+class GameRatingAnswerBuilder
+    implements Builder<GameRatingAnswer, GameRatingAnswerBuilder> {
+  _$GameRatingAnswer? _$v;
 
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  SteamGame? _steamGame;
-  SteamGame? get steamGame => _$this._steamGame;
-  set steamGame(SteamGame? steamGame) => _$this._steamGame = steamGame;
+  GameRatingBuilder? _gameRating;
+  GameRatingBuilder get gameRating =>
+      _$this._gameRating ??= new GameRatingBuilder();
+  set gameRating(GameRatingBuilder? gameRating) =>
+      _$this._gameRating = gameRating;
 
   UserBuilder? _user;
   UserBuilder get user => _$this._user ??= new UserBuilder();
   set user(UserBuilder? user) => _$this._user = user;
-
-  int? _rating;
-  int? get rating => _$this._rating;
-  set rating(int? rating) => _$this._rating = rating;
 
   String? _content;
   String? get content => _$this._content;
@@ -124,17 +119,16 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
-  GameRatingBuilder() {
-    GameRating._defaults(this);
+  GameRatingAnswerBuilder() {
+    GameRatingAnswer._defaults(this);
   }
 
-  GameRatingBuilder get _$this {
+  GameRatingAnswerBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _steamGame = $v.steamGame;
+      _gameRating = $v.gameRating?.toBuilder();
       _user = $v.user?.toBuilder();
-      _rating = $v.rating;
       _content = $v.content;
       _votesUp = $v.votesUp;
       _votesDown = $v.votesDown;
@@ -145,28 +139,27 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
   }
 
   @override
-  void replace(GameRating other) {
+  void replace(GameRatingAnswer other) {
     ArgumentError.checkNotNull(other, 'other');
-    _$v = other as _$GameRating;
+    _$v = other as _$GameRatingAnswer;
   }
 
   @override
-  void update(void Function(GameRatingBuilder)? updates) {
+  void update(void Function(GameRatingAnswerBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  GameRating build() => _build();
+  GameRatingAnswer build() => _build();
 
-  _$GameRating _build() {
-    _$GameRating _$result;
+  _$GameRatingAnswer _build() {
+    _$GameRatingAnswer _$result;
     try {
       _$result = _$v ??
-          new _$GameRating._(
+          new _$GameRatingAnswer._(
               id: id,
-              steamGame: steamGame,
+              gameRating: _gameRating?.build(),
               user: _user?.build(),
-              rating: rating,
               content: content,
               votesUp: votesUp,
               votesDown: votesDown,
@@ -174,11 +167,13 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
     } catch (_) {
       late String _$failedField;
       try {
+        _$failedField = 'gameRating';
+        _gameRating?.build();
         _$failedField = 'user';
         _user?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            r'GameRating', _$failedField, e.toString());
+            r'GameRatingAnswer', _$failedField, e.toString());
       }
       rethrow;
     }

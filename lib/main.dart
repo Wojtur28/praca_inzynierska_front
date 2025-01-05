@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2024-12-18T08:16:59.247785
+// Openapi Generator last run: : 2025-01-05T07:07:51.065379
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
@@ -48,7 +48,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  final ValueNotifier<ThemeMode> _themeNotifier = ValueNotifier(ThemeMode.light);
+  final ValueNotifier<ThemeMode> _themeNotifier = ValueNotifier(ThemeMode.dark);
 
   @override
   Widget build(BuildContext context) {
