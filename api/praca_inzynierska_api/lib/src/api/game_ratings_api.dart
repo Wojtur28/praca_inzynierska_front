@@ -12,6 +12,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/src/api_util.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating.dart';
+import 'package:praca_inzynierska_api/src/model/vote_request.dart';
 
 class GameRatingsApi {
   final Dio _dio;
@@ -134,6 +135,7 @@ class GameRatingsApi {
   /// * [gameId] - ID of the Steam game to retrieve ratings for
   /// * [page] - The page index (zero-based).
   /// * [size] - The number of items per page.
+  /// * [sort] - Sort order for the ratings (asc or desc).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -147,6 +149,7 @@ class GameRatingsApi {
     required String gameId,
     int? page = 0,
     int? size = 10,
+    String? sort = 'desc',
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -181,6 +184,9 @@ class GameRatingsApi {
         r'page': encodeQueryParameter(_serializers, page, const FullType(int)),
       if (size != null)
         r'size': encodeQueryParameter(_serializers, size, const FullType(int)),
+      if (sort != null)
+        r'sort':
+            encodeQueryParameter(_serializers, sort, const FullType(String)),
     };
 
     final _response = await _dio.request<Object>(
@@ -213,6 +219,112 @@ class GameRatingsApi {
     }
 
     return Response<BuiltList<GameRating>>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Vote on a game rating (upvote or downvote)
+  ///
+  ///
+  /// Parameters:
+  /// * [ratingId] - ID of the game rating to vote on.
+  /// * [voteRequest] - Vote details (upvote or downvote)
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [GameRating] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<GameRating>> voteOnGameRating({
+    required String ratingId,
+    required VoteRequest voteRequest,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/ratings/{ratingId}/vote'.replaceAll(
+        '{' r'ratingId' '}',
+        encodeQueryParameter(_serializers, ratingId, const FullType(String))
+            .toString());
+    final _options = Options(
+      method: r'PATCH',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(VoteRequest);
+      _bodyData = _serializers.serialize(voteRequest, specifiedType: _type);
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    GameRating? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(GameRating),
+            ) as GameRating;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<GameRating>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

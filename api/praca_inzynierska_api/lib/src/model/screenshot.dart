@@ -6,61 +6,69 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'create_game_rating.g.dart';
+part 'screenshot.g.dart';
 
-/// CreateGameRating
+/// Screenshot
 ///
 /// Properties:
-/// * [rating] - Rating score (1-10).
-/// * [content] - User's review content.
+/// * [id] - Unique identifier of the screenshot.
+/// * [pathThumbnail] - URL to the thumbnail version of the screenshot.
+/// * [pathFull] - URL to the full-size version of the screenshot.
 @BuiltValue()
-abstract class CreateGameRating
-    implements Built<CreateGameRating, CreateGameRatingBuilder> {
-  /// Rating score (1-10).
-  @BuiltValueField(wireName: r'rating')
-  int? get rating;
+abstract class Screenshot implements Built<Screenshot, ScreenshotBuilder> {
+  /// Unique identifier of the screenshot.
+  @BuiltValueField(wireName: r'id')
+  String? get id;
 
-  /// User's review content.
-  @BuiltValueField(wireName: r'content')
-  String? get content;
+  /// URL to the thumbnail version of the screenshot.
+  @BuiltValueField(wireName: r'pathThumbnail')
+  String? get pathThumbnail;
 
-  CreateGameRating._();
+  /// URL to the full-size version of the screenshot.
+  @BuiltValueField(wireName: r'pathFull')
+  String? get pathFull;
 
-  factory CreateGameRating([void updates(CreateGameRatingBuilder b)]) =
-      _$CreateGameRating;
+  Screenshot._();
+
+  factory Screenshot([void updates(ScreenshotBuilder b)]) = _$Screenshot;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(CreateGameRatingBuilder b) => b;
+  static void _defaults(ScreenshotBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<CreateGameRating> get serializer =>
-      _$CreateGameRatingSerializer();
+  static Serializer<Screenshot> get serializer => _$ScreenshotSerializer();
 }
 
-class _$CreateGameRatingSerializer
-    implements PrimitiveSerializer<CreateGameRating> {
+class _$ScreenshotSerializer implements PrimitiveSerializer<Screenshot> {
   @override
-  final Iterable<Type> types = const [CreateGameRating, _$CreateGameRating];
+  final Iterable<Type> types = const [Screenshot, _$Screenshot];
 
   @override
-  final String wireName = r'CreateGameRating';
+  final String wireName = r'Screenshot';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    CreateGameRating object, {
+    Screenshot object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    if (object.rating != null) {
-      yield r'rating';
+    if (object.id != null) {
+      yield r'id';
       yield serializers.serialize(
-        object.rating,
-        specifiedType: const FullType(int),
+        object.id,
+        specifiedType: const FullType(String),
       );
     }
-    if (object.content != null) {
-      yield r'content';
+    if (object.pathThumbnail != null) {
+      yield r'pathThumbnail';
       yield serializers.serialize(
-        object.content,
+        object.pathThumbnail,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.pathFull != null) {
+      yield r'pathFull';
+      yield serializers.serialize(
+        object.pathFull,
         specifiedType: const FullType(String),
       );
     }
@@ -69,7 +77,7 @@ class _$CreateGameRatingSerializer
   @override
   Object serialize(
     Serializers serializers,
-    CreateGameRating object, {
+    Screenshot object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -82,26 +90,33 @@ class _$CreateGameRatingSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required CreateGameRatingBuilder result,
+    required ScreenshotBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'rating':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.rating = valueDes;
-          break;
-        case r'content':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.content = valueDes;
+          result.id = valueDes;
+          break;
+        case r'pathThumbnail':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.pathThumbnail = valueDes;
+          break;
+        case r'pathFull':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.pathFull = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -112,12 +127,12 @@ class _$CreateGameRatingSerializer
   }
 
   @override
-  CreateGameRating deserialize(
+  Screenshot deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = CreateGameRatingBuilder();
+    final result = ScreenshotBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

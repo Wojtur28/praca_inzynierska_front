@@ -3,14 +3,16 @@ import 'package:dio/dio.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/domain/repositories/games_repository.dart';
+import 'package:praca_inzynierska_front/presentation/pages/rating_page.dart';
 
 import '../../data/filter_options.dart';
+import 'game_details_page.dart';
 
 class GamesPage extends StatefulWidget {
   final Dio dio;
   final ValueNotifier<ThemeMode> themeNotifier;
 
-  const GamesPage({Key? key, required this.dio, required this.themeNotifier}) : super(key: key);
+  const GamesPage({super.key, required this.dio, required this.themeNotifier});
 
   @override
   State<GamesPage> createState() => _GamesPageState();
@@ -84,113 +86,163 @@ class _GamesPageState extends State<GamesPage> {
     }
   }
 
-  Widget _buildFilterBar() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onBackground,
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
+  Widget _buildFilterSidebar() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Szukaj gier',
-              border: OutlineInputBorder(),
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
             ),
-            onChanged: (value) async {
-              if (value.isNotEmpty) {
-                final suggestions = await _gamesRepository.fetchGamesWithDetails(
-                  search: value,
-                );
+            child: const Text(
+              'Filtry wyszukiwania',
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: DropdownButton<String>(
+              value: _selectedPlatform,
+              hint: const Text('Platforma'),
+              isExpanded: true,
+              items: platforms.map((platform) {
+                return DropdownMenuItem(value: platform, child: Text(platform));
+              }).toList(),
+              onChanged: (value) {
                 setState(() {
-                  _games = BuiltList<SteamGameWithDetails>(suggestions);
-                });
-              } else {
-                setState(() {
+                  _selectedPlatform = value;
                   _games = BuiltList<SteamGameWithDetails>();
+                  _currentPage = 0;
+                  _hasMore = true;
                   _fetchGames();
                 });
-              }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: DropdownButton<String>(
+              value: _selectedCategories.isNotEmpty ? _selectedCategories.first : null,
+              hint: const Text('Kategoria'),
+              isExpanded: true,
+              items: allCategories.map((category) {
+                return DropdownMenuItem(value: category, child: Text(category));
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedCategories = [value];
+                    _games = BuiltList<SteamGameWithDetails>();
+                    _currentPage = 0;
+                    _hasMore = true;
+                    _fetchGames();
+                  });
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: DropdownButton<String>(
+              value: _selectedGenres.isNotEmpty ? _selectedGenres.first : null,
+              hint: const Text('Gatunek'),
+              isExpanded: true,
+              items: allGenres.map((genre) {
+                return DropdownMenuItem(value: genre, child: Text(genre));
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedGenres = [value];
+                    _games = BuiltList<SteamGameWithDetails>();
+                    _currentPage = 0;
+                    _hasMore = true;
+                    _fetchGames();
+                  });
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedPlatform = null;
+                  _selectedCategories.clear();
+                  _selectedGenres.clear();
+                  _games = BuiltList<SteamGameWithDetails>();
+                  _currentPage = 0;
+                  _hasMore = true;
+                  _fetchGames();
+                });
+              },
+              child: const Text('Resetuj filtry'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gry'),
+        actions: [
+          IconButton(
+            icon: Icon(widget.themeNotifier.value == ThemeMode.light
+                ? Icons.dark_mode
+                : Icons.light_mode),
+            onPressed: () {
+              widget.themeNotifier.value =
+              widget.themeNotifier.value == ThemeMode.light
+                  ? ThemeMode.dark
+                  : ThemeMode.light;
             },
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 8,
-            children: [
-              DropdownButton<String>(
-                value: _selectedPlatform,
-                hint: const Text('Platforma'),
-                items: platforms.map((platform) {
-                  return DropdownMenuItem(value: platform, child: Text(platform));
-                }).toList(),
-                onChanged: (value) {
+          const SizedBox(width: 16),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              // Add logout logic
+            },
+          ),
+        ],
+      ),
+      drawer: _buildFilterSidebar(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: 'Szukaj gier',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) async {
+                if (value.isNotEmpty) {
+                  final suggestions =
+                  await _gamesRepository.fetchGamesWithDetails(search: value);
                   setState(() {
-                    _selectedPlatform = value;
+                    _games = BuiltList<SteamGameWithDetails>(suggestions);
+                  });
+                } else {
+                  setState(() {
                     _games = BuiltList<SteamGameWithDetails>();
-                    _currentPage = 0;
-                    _hasMore = true;
                     _fetchGames();
                   });
-                },
-              ),
-              DropdownButton<String>(
-                value: _selectedCategories.isNotEmpty ? _selectedCategories.first : null,
-                hint: const Text('Kategoria'),
-                items: allCategories.map((category) {
-                  return DropdownMenuItem(value: category, child: Text(category));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedCategories = [value];
-                      _games = BuiltList<SteamGameWithDetails>();
-                      _currentPage = 0;
-                      _hasMore = true;
-                      _fetchGames();
-                    });
-                  }
-                },
-              ),
-              DropdownButton<String>(
-                value: _selectedGenres.isNotEmpty ? _selectedGenres.first : null,
-                hint: const Text('Gatunek'),
-                items: allGenres.map((genre) {
-                  return DropdownMenuItem(value: genre, child: Text(genre));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedGenres = [value];
-                      _games = BuiltList<SteamGameWithDetails>();
-                      _currentPage = 0;
-                      _hasMore = true;
-                      _fetchGames();
-                    });
-                  }
-                },
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedPlatform = null;
-                    _selectedCategories.clear();
-                    _selectedGenres.clear();
-                    _games = BuiltList<SteamGameWithDetails>();
-                    _currentPage = 0;
-                    _hasMore = true;
-                    _fetchGames();
-                  });
-                },
-                child: const Text('Resetuj filtry'),
-              ),
-            ],
+                }
+              },
+            ),
+          ),
+          Expanded(
+            child: _games.isEmpty && !_isLoading
+                ? const Center(child: Text('Brak wyników'))
+                : _buildGameGrid(),
           ),
         ],
       ),
@@ -202,10 +254,10 @@ class _GamesPageState extends State<GamesPage> {
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+        crossAxisCount: 4,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.5,
+        childAspectRatio: 0.8,
       ),
       itemCount: _games.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {
@@ -221,13 +273,15 @@ class _GamesPageState extends State<GamesPage> {
   }
 
   Widget _buildGameCard(SteamGameWithDetails game) {
-    final categories = (game.categories?.map((c) => c.name).toList() ?? []).take(2).toList();
-    final genres = (game.genres?.map((g) => g.name).toList() ?? []).take(2).toList();
+    final categories = (game.categories?.map((c) => c.name).toList() ?? []).take(3).join(', ');
+    final genres = (game.genres?.map((g) => g.name).toList() ?? []).take(3).join(', ');
+    final platforms = (game.platforms?.map((p) => p.name).toList() ?? []).take(3).join(', ');
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
@@ -250,22 +304,64 @@ class _GamesPageState extends State<GamesPage> {
               children: [
                 Text(
                   game.title ?? 'Brak tytułu',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                Text('Cena: \$${game.launchPrice ?? 'N/A'}',
+                Text('Cena na premierę: \$${game.launchPrice ?? 'N/A'}',
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                Text(
-                  'Kategorie: ${categories.join(', ')}',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.visible,
+                const SizedBox(height: 12),
+                if (categories.isNotEmpty)
+                  Text(
+                    'Kategorie: $categories',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
+                const SizedBox(height: 8),
+                if (genres.isNotEmpty)
+                  Text(
+                    'Gatunki: $genres',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
+                const SizedBox(height: 8),
+                if (platforms.isNotEmpty)
+                  Text(
+                    'Platformy: $platforms',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RatingsPage(
+                          dio: widget.dio,
+                          gameId: game.id!,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  ),
+                  child: const Text('Recenzje'),
                 ),
-                Text(
-                  'Gatunki: ${genres.join(', ')}',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.visible,
+                ElevatedButton(
+                  onPressed: () {
+                    _showGameDetails(context, game);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  ),
+                  child: const Text('Szczegóły'),
                 ),
               ],
             ),
@@ -275,35 +371,16 @@ class _GamesPageState extends State<GamesPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gry'),
-        actions: [
-          IconButton(
-            icon: Icon(widget.themeNotifier.value == ThemeMode.light
-                ? Icons.dark_mode
-                : Icons.light_mode),
-            onPressed: () {
-              widget.themeNotifier.value =
-              widget.themeNotifier.value == ThemeMode.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light;
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilterBar(),
-          Expanded(
-            child: _games.isEmpty && !_isLoading
-                ? const Center(child: Text('Brak wyników'))
-                : _buildGameGrid(),
-          ),
-        ],
+  void _showGameDetails(BuildContext context, SteamGameWithDetails game) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GameDetailsPage(
+          dio: widget.dio,
+          gameId: game.id!,
+        ),
       ),
     );
   }
+
 }

@@ -3,77 +3,76 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:praca_inzynierska_api/src/model/steam_game.dart';
+import 'package:praca_inzynierska_api/src/model/game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/user.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'game_rating.g.dart';
+part 'game_rating_answer.g.dart';
 
-/// GameRating
+/// GameRatingAnswer
 ///
 /// Properties:
-/// * [id] - Unique identifier of the rating.
-/// * [steamGame]
+/// * [id] - Unique identifier of the answer.
+/// * [gameRating]
 /// * [user]
-/// * [rating] - The rating score given by the user.
-/// * [content] - Additional comments provided by the user.
-/// * [votesUp] - Number of upvotes for this rating.
-/// * [votesDown] - Number of downvotes for this rating.
-/// * [createdAt] - Timestamp when the rating was created.
+/// * [content] - Content of the answer.
+/// * [votesUp] - Number of upvotes for this answer.
+/// * [votesDown] - Number of downvotes for this answer.
+/// * [createdAt] - Timestamp when the answer was created.
 @BuiltValue()
-abstract class GameRating implements Built<GameRating, GameRatingBuilder> {
-  /// Unique identifier of the rating.
+abstract class GameRatingAnswer
+    implements Built<GameRatingAnswer, GameRatingAnswerBuilder> {
+  /// Unique identifier of the answer.
   @BuiltValueField(wireName: r'id')
   String? get id;
 
-  @BuiltValueField(wireName: r'steamGame')
-  SteamGame? get steamGame;
+  @BuiltValueField(wireName: r'gameRating')
+  GameRating? get gameRating;
 
   @BuiltValueField(wireName: r'user')
   User? get user;
 
-  /// The rating score given by the user.
-  @BuiltValueField(wireName: r'rating')
-  int? get rating;
-
-  /// Additional comments provided by the user.
+  /// Content of the answer.
   @BuiltValueField(wireName: r'content')
   String? get content;
 
-  /// Number of upvotes for this rating.
+  /// Number of upvotes for this answer.
   @BuiltValueField(wireName: r'votesUp')
   int? get votesUp;
 
-  /// Number of downvotes for this rating.
+  /// Number of downvotes for this answer.
   @BuiltValueField(wireName: r'votesDown')
   int? get votesDown;
 
-  /// Timestamp when the rating was created.
+  /// Timestamp when the answer was created.
   @BuiltValueField(wireName: r'createdAt')
   DateTime? get createdAt;
 
-  GameRating._();
+  GameRatingAnswer._();
 
-  factory GameRating([void updates(GameRatingBuilder b)]) = _$GameRating;
+  factory GameRatingAnswer([void updates(GameRatingAnswerBuilder b)]) =
+      _$GameRatingAnswer;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(GameRatingBuilder b) => b;
+  static void _defaults(GameRatingAnswerBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<GameRating> get serializer => _$GameRatingSerializer();
+  static Serializer<GameRatingAnswer> get serializer =>
+      _$GameRatingAnswerSerializer();
 }
 
-class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
+class _$GameRatingAnswerSerializer
+    implements PrimitiveSerializer<GameRatingAnswer> {
   @override
-  final Iterable<Type> types = const [GameRating, _$GameRating];
+  final Iterable<Type> types = const [GameRatingAnswer, _$GameRatingAnswer];
 
   @override
-  final String wireName = r'GameRating';
+  final String wireName = r'GameRatingAnswer';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    GameRating object, {
+    GameRatingAnswer object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     if (object.id != null) {
@@ -83,11 +82,11 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
         specifiedType: const FullType(String),
       );
     }
-    if (object.steamGame != null) {
-      yield r'steamGame';
+    if (object.gameRating != null) {
+      yield r'gameRating';
       yield serializers.serialize(
-        object.steamGame,
-        specifiedType: const FullType(SteamGame),
+        object.gameRating,
+        specifiedType: const FullType(GameRating),
       );
     }
     if (object.user != null) {
@@ -95,13 +94,6 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
       yield serializers.serialize(
         object.user,
         specifiedType: const FullType(User),
-      );
-    }
-    if (object.rating != null) {
-      yield r'rating';
-      yield serializers.serialize(
-        object.rating,
-        specifiedType: const FullType(int),
       );
     }
     if (object.content != null) {
@@ -137,7 +129,7 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
   @override
   Object serialize(
     Serializers serializers,
-    GameRating object, {
+    GameRatingAnswer object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -150,7 +142,7 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required GameRatingBuilder result,
+    required GameRatingAnswerBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -164,12 +156,12 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
           ) as String;
           result.id = valueDes;
           break;
-        case r'steamGame':
+        case r'gameRating':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(SteamGame),
-          ) as SteamGame;
-          result.steamGame = valueDes;
+            specifiedType: const FullType(GameRating),
+          ) as GameRating;
+          result.gameRating.replace(valueDes);
           break;
         case r'user':
           final valueDes = serializers.deserialize(
@@ -177,13 +169,6 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
             specifiedType: const FullType(User),
           ) as User;
           result.user.replace(valueDes);
-          break;
-        case r'rating':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.rating = valueDes;
           break;
         case r'content':
           final valueDes = serializers.deserialize(
@@ -222,12 +207,12 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
   }
 
   @override
-  GameRating deserialize(
+  GameRatingAnswer deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = GameRatingBuilder();
+    final result = GameRatingAnswerBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

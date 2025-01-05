@@ -31,6 +31,8 @@ class _$SteamGameDetail extends SteamGameDetail {
   final BuiltList<Genre>? genres;
   @override
   final BuiltList<Platform>? platforms;
+  @override
+  final BuiltList<Screenshot>? screenshots;
 
   factory _$SteamGameDetail([void Function(SteamGameDetailBuilder)? updates]) =>
       (new SteamGameDetailBuilder()..update(updates))._build();
@@ -47,7 +49,8 @@ class _$SteamGameDetail extends SteamGameDetail {
       this.supportedLanguages,
       this.categories,
       this.genres,
-      this.platforms})
+      this.platforms,
+      this.screenshots})
       : super._();
 
   @override
@@ -73,7 +76,8 @@ class _$SteamGameDetail extends SteamGameDetail {
         supportedLanguages == other.supportedLanguages &&
         categories == other.categories &&
         genres == other.genres &&
-        platforms == other.platforms;
+        platforms == other.platforms &&
+        screenshots == other.screenshots;
   }
 
   @override
@@ -91,6 +95,7 @@ class _$SteamGameDetail extends SteamGameDetail {
     _$hash = $jc(_$hash, categories.hashCode);
     _$hash = $jc(_$hash, genres.hashCode);
     _$hash = $jc(_$hash, platforms.hashCode);
+    _$hash = $jc(_$hash, screenshots.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -109,7 +114,8 @@ class _$SteamGameDetail extends SteamGameDetail {
           ..add('supportedLanguages', supportedLanguages)
           ..add('categories', categories)
           ..add('genres', genres)
-          ..add('platforms', platforms))
+          ..add('platforms', platforms)
+          ..add('screenshots', screenshots))
         .toString();
   }
 }
@@ -172,6 +178,12 @@ class SteamGameDetailBuilder
   set platforms(ListBuilder<Platform>? platforms) =>
       _$this._platforms = platforms;
 
+  ListBuilder<Screenshot>? _screenshots;
+  ListBuilder<Screenshot> get screenshots =>
+      _$this._screenshots ??= new ListBuilder<Screenshot>();
+  set screenshots(ListBuilder<Screenshot>? screenshots) =>
+      _$this._screenshots = screenshots;
+
   SteamGameDetailBuilder() {
     SteamGameDetail._defaults(this);
   }
@@ -191,6 +203,7 @@ class SteamGameDetailBuilder
       _categories = $v.categories?.toBuilder();
       _genres = $v.genres?.toBuilder();
       _platforms = $v.platforms?.toBuilder();
+      _screenshots = $v.screenshots?.toBuilder();
       _$v = null;
     }
     return this;
@@ -226,7 +239,8 @@ class SteamGameDetailBuilder
               supportedLanguages: supportedLanguages,
               categories: _categories?.build(),
               genres: _genres?.build(),
-              platforms: _platforms?.build());
+              platforms: _platforms?.build(),
+              screenshots: _screenshots?.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -236,6 +250,8 @@ class SteamGameDetailBuilder
         _genres?.build();
         _$failedField = 'platforms';
         _platforms?.build();
+        _$failedField = 'screenshots';
+        _screenshots?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             r'SteamGameDetail', _$failedField, e.toString());

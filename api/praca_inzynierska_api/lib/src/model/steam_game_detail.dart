@@ -6,6 +6,7 @@
 import 'package:praca_inzynierska_api/src/model/category.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
+import 'package:praca_inzynierska_api/src/model/screenshot.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -27,6 +28,7 @@ part 'steam_game_detail.g.dart';
 /// * [categories] - List of categories associated with the game.
 /// * [genres] - List of genres associated with the game.
 /// * [platforms] - List of platforms supported by the game.
+/// * [screenshots] - List of screenshots associated with the game.
 @BuiltValue()
 abstract class SteamGameDetail
     implements Built<SteamGameDetail, SteamGameDetailBuilder> {
@@ -77,6 +79,10 @@ abstract class SteamGameDetail
   /// List of platforms supported by the game.
   @BuiltValueField(wireName: r'platforms')
   BuiltList<Platform>? get platforms;
+
+  /// List of screenshots associated with the game.
+  @BuiltValueField(wireName: r'screenshots')
+  BuiltList<Screenshot>? get screenshots;
 
   SteamGameDetail._();
 
@@ -188,6 +194,13 @@ class _$SteamGameDetailSerializer
         specifiedType: const FullType(BuiltList, [FullType(Platform)]),
       );
     }
+    if (object.screenshots != null) {
+      yield r'screenshots';
+      yield serializers.serialize(
+        object.screenshots,
+        specifiedType: const FullType(BuiltList, [FullType(Screenshot)]),
+      );
+    }
   }
 
   @override
@@ -296,6 +309,13 @@ class _$SteamGameDetailSerializer
             specifiedType: const FullType(BuiltList, [FullType(Platform)]),
           ) as BuiltList<Platform>;
           result.platforms.replace(valueDes);
+          break;
+        case r'screenshots':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(Screenshot)]),
+          ) as BuiltList<Screenshot>;
+          result.screenshots.replace(valueDes);
           break;
         default:
           unhandled.add(key);

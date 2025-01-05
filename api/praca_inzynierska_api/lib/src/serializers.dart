@@ -16,24 +16,31 @@ import 'package:praca_inzynierska_api/src/model/date.dart';
 
 import 'package:praca_inzynierska_api/src/model/category.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating.dart';
+import 'package:praca_inzynierska_api/src/model/create_game_rating_answer.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating.dart';
+import 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
+import 'package:praca_inzynierska_api/src/model/screenshot.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 import 'package:praca_inzynierska_api/src/model/steam_review.dart';
 import 'package:praca_inzynierska_api/src/model/steam_user.dart';
 import 'package:praca_inzynierska_api/src/model/user.dart';
+import 'package:praca_inzynierska_api/src/model/vote_request.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
   Category,
   CreateGameRating,
+  CreateGameRatingAnswer,
   GameRating,
+  GameRatingAnswer,
   Genre,
   Platform,
+  Screenshot,
   SteamGame,
   $SteamGame,
   SteamGameDetail,
@@ -41,6 +48,7 @@ part 'serializers.g.dart';
   SteamReview,
   SteamUser,
   User,
+  VoteRequest,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
@@ -50,6 +58,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SteamReview)]),
         () => ListBuilder<SteamReview>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(GameRatingAnswer)]),
+        () => ListBuilder<GameRatingAnswer>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SteamGame)]),
