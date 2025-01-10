@@ -21,8 +21,8 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(SteamReview.serializer)
       ..add(SteamUser.serializer)
       ..add(User.serializer)
-      ..add(VoteRequest.serializer)
-      ..add(VoteRequestVoteTypeEnum.serializer)
+      ..add(Vote.serializer)
+      ..add(VoteCount.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(Category)]),
           () => new ListBuilder<Category>())

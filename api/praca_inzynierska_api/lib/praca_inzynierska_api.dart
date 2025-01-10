@@ -14,6 +14,7 @@ export 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 export 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
 export 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 export 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
+export 'package:praca_inzynierska_api/src/api/votes_api.dart';
 
 export 'package:praca_inzynierska_api/src/model/category.dart';
 export 'package:praca_inzynierska_api/src/model/create_game_rating.dart';
@@ -29,4 +30,5 @@ export 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 export 'package:praca_inzynierska_api/src/model/steam_review.dart';
 export 'package:praca_inzynierska_api/src/model/steam_user.dart';
 export 'package:praca_inzynierska_api/src/model/user.dart';
-export 'package:praca_inzynierska_api/src/model/vote_request.dart';
+export 'package:praca_inzynierska_api/src/model/vote.dart';
+export 'package:praca_inzynierska_api/src/model/vote_count.dart';

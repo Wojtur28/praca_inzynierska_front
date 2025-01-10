@@ -28,7 +28,8 @@ import 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 import 'package:praca_inzynierska_api/src/model/steam_review.dart';
 import 'package:praca_inzynierska_api/src/model/steam_user.dart';
 import 'package:praca_inzynierska_api/src/model/user.dart';
-import 'package:praca_inzynierska_api/src/model/vote_request.dart';
+import 'package:praca_inzynierska_api/src/model/vote.dart';
+import 'package:praca_inzynierska_api/src/model/vote_count.dart';
 
 part 'serializers.g.dart';
 
@@ -48,7 +49,8 @@ part 'serializers.g.dart';
   SteamReview,
   SteamUser,
   User,
-  VoteRequest,
+  Vote,
+  VoteCount,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
