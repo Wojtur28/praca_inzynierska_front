@@ -13,6 +13,7 @@ import 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 import 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
+import 'package:praca_inzynierska_api/src/api/votes_api.dart';
 
 class PracaInzynierskaApi {
   static const String basePath = r'http://localhost:8080';
@@ -101,5 +102,11 @@ class PracaInzynierskaApi {
   /// by doing that all interceptors will not be executed
   SteamReviewsApi getSteamReviewsApi() {
     return SteamReviewsApi(dio, serializers);
+  }
+
+  /// Get VotesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  VotesApi getVotesApi() {
+    return VotesApi(dio, serializers);
   }
 }
