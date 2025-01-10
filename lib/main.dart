@@ -7,7 +7,10 @@ import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
 
+import 'auth/CustomAuthInterceptor.dart';
 import 'data/auth_storage.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +19,7 @@ void main() async {
 
   final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
   final bearerAuthInterceptor = BearerAuthInterceptor();
+  dio.interceptors.add(CustomAuthInterceptor(authStorage: authStorage));
   dio.interceptors.add(bearerAuthInterceptor);
 
   if (token != null && token.isNotEmpty) {
@@ -25,6 +29,7 @@ void main() async {
   runApp(MyApp(
     initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
     dio: dio,
+    navigatorKey: navigatorKey,
   ));
 }
 
@@ -39,8 +44,9 @@ void main() async {
 class MyApp extends StatefulWidget {
   final String initialRoute;
   final Dio dio;
+  final GlobalKey<NavigatorState> navigatorKey;
 
-  const MyApp({super.key, required this.initialRoute, required this.dio});
+  const MyApp({super.key, required this.initialRoute, required this.dio, required this.navigatorKey});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -56,6 +62,7 @@ class _MyAppState extends State<MyApp> {
       valueListenable: _themeNotifier,
       builder: (context, themeMode, child) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Aplikacja Uwierzytelniania',
           theme: ThemeData.light(),
