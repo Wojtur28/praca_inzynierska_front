@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
+import 'package:praca_inzynierska_front/domain/repositories/auth_repository.dart';
 import 'package:praca_inzynierska_front/domain/repositories/games_repository.dart';
 import 'package:praca_inzynierska_front/presentation/pages/rating_page.dart';
 
@@ -11,8 +12,9 @@ import 'game_details_page.dart';
 class GamesPage extends StatefulWidget {
   final Dio dio;
   final ValueNotifier<ThemeMode> themeNotifier;
+  final AuthRepository authRepository;
 
-  const GamesPage({super.key, required this.dio, required this.themeNotifier});
+  const GamesPage({super.key, required this.dio, required this.themeNotifier, required this.authRepository});
 
   @override
   State<GamesPage> createState() => _GamesPageState();
@@ -207,8 +209,29 @@ class _GamesPageState extends State<GamesPage> {
           const SizedBox(width: 16),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              // Add logout logic
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Wylogowanie'),
+                  content: const Text('Czy na pewno chcesz się wylogować?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Anuluj'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Wyloguj'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true) {
+                await widget.authRepository.logout();
+                Navigator.of(context).pushNamedAndRemoveUntil('/signin', (route) => false);
+              }
             },
           ),
         ],
@@ -248,6 +271,7 @@ class _GamesPageState extends State<GamesPage> {
       ),
     );
   }
+
 
   Widget _buildGameGrid() {
     return GridView.builder(

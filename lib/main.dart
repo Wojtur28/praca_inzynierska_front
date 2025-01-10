@@ -9,6 +9,7 @@ import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
 
 import 'auth/CustomAuthInterceptor.dart';
 import 'data/auth_storage.dart';
+import 'domain/repositories/auth_repository.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -26,10 +27,13 @@ void main() async {
     bearerAuthInterceptor.tokens['bearerAuth'] = token;
   }
 
+  final authRepository = AuthRepository(dio);
+
   runApp(MyApp(
     initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
     dio: dio,
     navigatorKey: navigatorKey,
+    authRepository: authRepository,
   ));
 }
 
@@ -45,8 +49,9 @@ class MyApp extends StatefulWidget {
   final String initialRoute;
   final Dio dio;
   final GlobalKey<NavigatorState> navigatorKey;
+  final AuthRepository authRepository;
 
-  const MyApp({super.key, required this.initialRoute, required this.dio, required this.navigatorKey});
+  const MyApp({super.key, required this.initialRoute, required this.dio, required this.navigatorKey, required this.authRepository});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -64,7 +69,7 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          title: 'Aplikacja Uwierzytelniania',
+          title: 'Praca inżynierska',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: themeMode,
@@ -72,7 +77,7 @@ class _MyAppState extends State<MyApp> {
           routes: {
             '/signin': (context) => SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
             '/signup': (context) => SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
-            '/games': (context) => GamesPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/games': (context) => GamesPage(dio: widget.dio, themeNotifier: _themeNotifier, authRepository: widget.authRepository),
           },
         );
       },
