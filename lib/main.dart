@@ -1,8 +1,9 @@
-// Openapi Generator last run: : 2025-01-13T08:42:34.122576
+// Openapi Generator last run: : 2025-01-13T16:15:15.613883
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
+import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
@@ -29,17 +30,22 @@ void main() async {
 
   final authRepository = AuthRepository(dio);
 
+  final userApi = UserApi(dio, standardSerializers);
+
   runApp(MyApp(
     initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
     dio: dio,
     navigatorKey: navigatorKey,
     authRepository: authRepository,
+    userApi: userApi,
   ));
 }
 
 @Openapi(
-  additionalProperties:
-  DioProperties(pubName: 'praca_inzynierska_api', pubAuthor: 'Maciej Wojturski'),
+  additionalProperties: DioProperties(
+    pubName: 'praca_inzynierska_api',
+    pubAuthor: 'Maciej Wojturski',
+  ),
   inputSpec: InputSpec(path: 'lib/swaggers/contract.yml'),
   generatorName: Generator.dio,
   runSourceGenOnOutput: true,
@@ -50,15 +56,22 @@ class MyApp extends StatefulWidget {
   final Dio dio;
   final GlobalKey<NavigatorState> navigatorKey;
   final AuthRepository authRepository;
+  final UserApi userApi;
 
-  const MyApp({super.key, required this.initialRoute, required this.dio, required this.navigatorKey, required this.authRepository});
+  const MyApp({
+    super.key,
+    required this.initialRoute,
+    required this.dio,
+    required this.navigatorKey,
+    required this.authRepository,
+    required this.userApi,
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-
   final ValueNotifier<ThemeMode> _themeNotifier = ValueNotifier(ThemeMode.dark);
 
   @override
@@ -67,7 +80,7 @@ class _MyAppState extends State<MyApp> {
       valueListenable: _themeNotifier,
       builder: (context, themeMode, child) {
         return MaterialApp(
-          navigatorKey: navigatorKey,
+          navigatorKey: widget.navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Praca inżynierska',
           theme: ThemeData.light(),
@@ -75,9 +88,18 @@ class _MyAppState extends State<MyApp> {
           themeMode: themeMode,
           initialRoute: widget.initialRoute,
           routes: {
-            '/signin': (context) => SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
-            '/signup': (context) => SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
-            '/games': (context) => GamesPage(dio: widget.dio, themeNotifier: _themeNotifier, authRepository: widget.authRepository),
+            '/signin': (context) =>
+                SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/signup': (context) =>
+                SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
+            '/games': (context) => GamesPage(
+                dio: widget.dio,
+                themeNotifier: _themeNotifier,
+                authRepository: widget.authRepository),
+            '/admin': (context) => AdminPanelPage(
+              dio: widget.dio,
+              userApi: widget.userApi,
+            ),
           },
         );
       },

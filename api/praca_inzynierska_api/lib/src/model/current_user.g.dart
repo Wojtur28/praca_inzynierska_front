@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user.dart';
+part of 'current_user.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$User extends User {
+class _$CurrentUser extends CurrentUser {
   @override
   final String? id;
   @override
@@ -22,10 +22,10 @@ class _$User extends User {
   @override
   final BuiltList<String>? roles;
 
-  factory _$User([void Function(UserBuilder)? updates]) =>
-      (new UserBuilder()..update(updates))._build();
+  factory _$CurrentUser([void Function(CurrentUserBuilder)? updates]) =>
+      (new CurrentUserBuilder()..update(updates))._build();
 
-  _$User._(
+  _$CurrentUser._(
       {this.id,
       this.email,
       this.firstName,
@@ -36,16 +36,16 @@ class _$User extends User {
       : super._();
 
   @override
-  User rebuild(void Function(UserBuilder) updates) =>
+  CurrentUser rebuild(void Function(CurrentUserBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  UserBuilder toBuilder() => new UserBuilder()..replace(this);
+  CurrentUserBuilder toBuilder() => new CurrentUserBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is User &&
+    return other is CurrentUser &&
         id == other.id &&
         email == other.email &&
         firstName == other.firstName &&
@@ -71,7 +71,7 @@ class _$User extends User {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'User')
+    return (newBuiltValueToStringHelper(r'CurrentUser')
           ..add('id', id)
           ..add('email', email)
           ..add('firstName', firstName)
@@ -83,8 +83,8 @@ class _$User extends User {
   }
 }
 
-class UserBuilder implements Builder<User, UserBuilder> {
-  _$User? _$v;
+class CurrentUserBuilder implements Builder<CurrentUser, CurrentUserBuilder> {
+  _$CurrentUser? _$v;
 
   String? _id;
   String? get id => _$this._id;
@@ -114,11 +114,11 @@ class UserBuilder implements Builder<User, UserBuilder> {
   ListBuilder<String> get roles => _$this._roles ??= new ListBuilder<String>();
   set roles(ListBuilder<String>? roles) => _$this._roles = roles;
 
-  UserBuilder() {
-    User._defaults(this);
+  CurrentUserBuilder() {
+    CurrentUser._defaults(this);
   }
 
-  UserBuilder get _$this {
+  CurrentUserBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
@@ -134,24 +134,24 @@ class UserBuilder implements Builder<User, UserBuilder> {
   }
 
   @override
-  void replace(User other) {
+  void replace(CurrentUser other) {
     ArgumentError.checkNotNull(other, 'other');
-    _$v = other as _$User;
+    _$v = other as _$CurrentUser;
   }
 
   @override
-  void update(void Function(UserBuilder)? updates) {
+  void update(void Function(CurrentUserBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  User build() => _build();
+  CurrentUser build() => _build();
 
-  _$User _build() {
-    _$User _$result;
+  _$CurrentUser _build() {
+    _$CurrentUser _$result;
     try {
       _$result = _$v ??
-          new _$User._(
+          new _$CurrentUser._(
               id: id,
               email: email,
               firstName: firstName,
@@ -166,7 +166,7 @@ class UserBuilder implements Builder<User, UserBuilder> {
         _roles?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            r'User', _$failedField, e.toString());
+            r'CurrentUser', _$failedField, e.toString());
       }
       rethrow;
     }

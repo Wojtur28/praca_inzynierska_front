@@ -14,6 +14,7 @@ export 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 export 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
 export 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 export 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
+export 'package:praca_inzynierska_api/src/api/user_api.dart';
 export 'package:praca_inzynierska_api/src/api/votes_api.dart';
 
 export 'package:praca_inzynierska_api/src/model/category.dart';

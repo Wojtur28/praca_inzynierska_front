@@ -19,6 +19,7 @@ doc/SteamReview.md
 doc/SteamReviewsApi.md
 doc/SteamUser.md
 doc/User.md
+doc/UserApi.md
 doc/Vote.md
 doc/VoteCount.md
 doc/VotesApi.md
@@ -28,6 +29,7 @@ lib/src/api/game_rating_answers_api.dart
 lib/src/api/game_ratings_api.dart
 lib/src/api/steam_games_api.dart
 lib/src/api/steam_reviews_api.dart
+lib/src/api/user_api.dart
 lib/src/api/votes_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
