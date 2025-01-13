@@ -19,6 +19,7 @@ part 'game_rating.g.dart';
 /// * [rating] - The rating score given by the user.
 /// * [content] - Additional comments provided by the user.
 /// * [createdAt] - Timestamp when the rating was created.
+/// * [createdBy] - User who created the rating.
 @BuiltValue()
 abstract class GameRating implements Built<GameRating, GameRatingBuilder> {
   /// Unique identifier of the rating.
@@ -42,6 +43,10 @@ abstract class GameRating implements Built<GameRating, GameRatingBuilder> {
   /// Timestamp when the rating was created.
   @BuiltValueField(wireName: r'createdAt')
   DateTime? get createdAt;
+
+  /// User who created the rating.
+  @BuiltValueField(wireName: r'createdBy')
+  String? get createdBy;
 
   GameRating._();
 
@@ -106,6 +111,13 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
       yield serializers.serialize(
         object.createdAt,
         specifiedType: const FullType(DateTime),
+      );
+    }
+    if (object.createdBy != null) {
+      yield r'createdBy';
+      yield serializers.serialize(
+        object.createdBy,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -174,6 +186,13 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
+          break;
+        case r'createdBy':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdBy = valueDes;
           break;
         default:
           unhandled.add(key);

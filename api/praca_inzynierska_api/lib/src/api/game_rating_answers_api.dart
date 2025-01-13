@@ -127,6 +127,69 @@ class GameRatingAnswersApi {
     );
   }
 
+  /// Delete an answer for a specific game rating
+  ///
+  ///
+  /// Parameters:
+  /// * [ratingId] - ID of the rating to delete an answer for.
+  /// * [answerId] - ID of the answer to delete.
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> deleteGameRatingAnswer({
+    required String ratingId,
+    required String answerId,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/ratings/{ratingId}/answers/{answerId}'
+        .replaceAll(
+            '{' r'ratingId' '}',
+            encodeQueryParameter(_serializers, ratingId, const FullType(String))
+                .toString())
+        .replaceAll(
+            '{' r'answerId' '}',
+            encodeQueryParameter(_serializers, answerId, const FullType(String))
+                .toString());
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
+  }
+
   /// Retrieve answers for a specific game rating
   ///
   ///

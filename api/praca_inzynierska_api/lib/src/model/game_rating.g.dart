@@ -19,6 +19,8 @@ class _$GameRating extends GameRating {
   final String? content;
   @override
   final DateTime? createdAt;
+  @override
+  final String? createdBy;
 
   factory _$GameRating([void Function(GameRatingBuilder)? updates]) =>
       (new GameRatingBuilder()..update(updates))._build();
@@ -29,7 +31,8 @@ class _$GameRating extends GameRating {
       this.user,
       this.rating,
       this.content,
-      this.createdAt})
+      this.createdAt,
+      this.createdBy})
       : super._();
 
   @override
@@ -48,7 +51,8 @@ class _$GameRating extends GameRating {
         user == other.user &&
         rating == other.rating &&
         content == other.content &&
-        createdAt == other.createdAt;
+        createdAt == other.createdAt &&
+        createdBy == other.createdBy;
   }
 
   @override
@@ -60,6 +64,7 @@ class _$GameRating extends GameRating {
     _$hash = $jc(_$hash, rating.hashCode);
     _$hash = $jc(_$hash, content.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdBy.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -72,7 +77,8 @@ class _$GameRating extends GameRating {
           ..add('user', user)
           ..add('rating', rating)
           ..add('content', content)
-          ..add('createdAt', createdAt))
+          ..add('createdAt', createdAt)
+          ..add('createdBy', createdBy))
         .toString();
   }
 }
@@ -104,6 +110,10 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
+  String? _createdBy;
+  String? get createdBy => _$this._createdBy;
+  set createdBy(String? createdBy) => _$this._createdBy = createdBy;
+
   GameRatingBuilder() {
     GameRating._defaults(this);
   }
@@ -117,6 +127,7 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
       _rating = $v.rating;
       _content = $v.content;
       _createdAt = $v.createdAt;
+      _createdBy = $v.createdBy;
       _$v = null;
     }
     return this;
@@ -146,7 +157,8 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
               user: _user?.build(),
               rating: rating,
               content: content,
-              createdAt: createdAt);
+              createdAt: createdAt,
+              createdBy: createdBy);
     } catch (_) {
       late String _$failedField;
       try {
