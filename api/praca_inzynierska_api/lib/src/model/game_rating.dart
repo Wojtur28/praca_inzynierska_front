@@ -18,9 +18,8 @@ part 'game_rating.g.dart';
 /// * [user]
 /// * [rating] - The rating score given by the user.
 /// * [content] - Additional comments provided by the user.
-/// * [votesUp] - Number of upvotes for this rating.
-/// * [votesDown] - Number of downvotes for this rating.
 /// * [createdAt] - Timestamp when the rating was created.
+/// * [createdBy] - User who created the rating.
 @BuiltValue()
 abstract class GameRating implements Built<GameRating, GameRatingBuilder> {
   /// Unique identifier of the rating.
@@ -41,17 +40,13 @@ abstract class GameRating implements Built<GameRating, GameRatingBuilder> {
   @BuiltValueField(wireName: r'content')
   String? get content;
 
-  /// Number of upvotes for this rating.
-  @BuiltValueField(wireName: r'votesUp')
-  int? get votesUp;
-
-  /// Number of downvotes for this rating.
-  @BuiltValueField(wireName: r'votesDown')
-  int? get votesDown;
-
   /// Timestamp when the rating was created.
   @BuiltValueField(wireName: r'createdAt')
   DateTime? get createdAt;
+
+  /// User who created the rating.
+  @BuiltValueField(wireName: r'createdBy')
+  String? get createdBy;
 
   GameRating._();
 
@@ -111,25 +106,18 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
         specifiedType: const FullType(String),
       );
     }
-    if (object.votesUp != null) {
-      yield r'votesUp';
-      yield serializers.serialize(
-        object.votesUp,
-        specifiedType: const FullType(int),
-      );
-    }
-    if (object.votesDown != null) {
-      yield r'votesDown';
-      yield serializers.serialize(
-        object.votesDown,
-        specifiedType: const FullType(int),
-      );
-    }
     if (object.createdAt != null) {
       yield r'createdAt';
       yield serializers.serialize(
         object.createdAt,
         specifiedType: const FullType(DateTime),
+      );
+    }
+    if (object.createdBy != null) {
+      yield r'createdBy';
+      yield serializers.serialize(
+        object.createdBy,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -192,26 +180,19 @@ class _$GameRatingSerializer implements PrimitiveSerializer<GameRating> {
           ) as String;
           result.content = valueDes;
           break;
-        case r'votesUp':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.votesUp = valueDes;
-          break;
-        case r'votesDown':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.votesDown = valueDes;
-          break;
         case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
+          break;
+        case r'createdBy':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdBy = valueDes;
           break;
         default:
           unhandled.add(key);

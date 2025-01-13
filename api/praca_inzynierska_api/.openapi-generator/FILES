@@ -19,13 +19,16 @@ doc/SteamReview.md
 doc/SteamReviewsApi.md
 doc/SteamUser.md
 doc/User.md
-doc/VoteRequest.md
+doc/Vote.md
+doc/VoteCount.md
+doc/VotesApi.md
 lib/praca_inzynierska_api.dart
 lib/src/api.dart
 lib/src/api/game_rating_answers_api.dart
 lib/src/api/game_ratings_api.dart
 lib/src/api/steam_games_api.dart
 lib/src/api/steam_reviews_api.dart
+lib/src/api/votes_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
 lib/src/auth/auth.dart
@@ -48,6 +51,7 @@ lib/src/model/steam_game_with_details.dart
 lib/src/model/steam_review.dart
 lib/src/model/steam_user.dart
 lib/src/model/user.dart
-lib/src/model/vote_request.dart
+lib/src/model/vote.dart
+lib/src/model/vote_count.dart
 lib/src/serializers.dart
 pubspec.yaml
