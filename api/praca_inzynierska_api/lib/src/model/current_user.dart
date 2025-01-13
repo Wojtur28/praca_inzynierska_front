@@ -8,9 +8,9 @@ import 'package:praca_inzynierska_api/src/model/date.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'user.g.dart';
+part 'current_user.g.dart';
 
-/// User
+/// CurrentUser
 ///
 /// Properties:
 /// * [id]
@@ -21,7 +21,7 @@ part 'user.g.dart';
 /// * [dateOfBirth]
 /// * [roles]
 @BuiltValue()
-abstract class User implements Built<User, UserBuilder> {
+abstract class CurrentUser implements Built<CurrentUser, CurrentUserBuilder> {
   @BuiltValueField(wireName: r'id')
   String? get id;
 
@@ -43,27 +43,27 @@ abstract class User implements Built<User, UserBuilder> {
   @BuiltValueField(wireName: r'roles')
   BuiltList<String>? get roles;
 
-  User._();
+  CurrentUser._();
 
-  factory User([void updates(UserBuilder b)]) = _$User;
+  factory CurrentUser([void updates(CurrentUserBuilder b)]) = _$CurrentUser;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(UserBuilder b) => b;
+  static void _defaults(CurrentUserBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<User> get serializer => _$UserSerializer();
+  static Serializer<CurrentUser> get serializer => _$CurrentUserSerializer();
 }
 
-class _$UserSerializer implements PrimitiveSerializer<User> {
+class _$CurrentUserSerializer implements PrimitiveSerializer<CurrentUser> {
   @override
-  final Iterable<Type> types = const [User, _$User];
+  final Iterable<Type> types = const [CurrentUser, _$CurrentUser];
 
   @override
-  final String wireName = r'User';
+  final String wireName = r'CurrentUser';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    User object, {
+    CurrentUser object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     if (object.id != null) {
@@ -120,7 +120,7 @@ class _$UserSerializer implements PrimitiveSerializer<User> {
   @override
   Object serialize(
     Serializers serializers,
-    User object, {
+    CurrentUser object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -133,7 +133,7 @@ class _$UserSerializer implements PrimitiveSerializer<User> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required UserBuilder result,
+    required CurrentUserBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -198,12 +198,12 @@ class _$UserSerializer implements PrimitiveSerializer<User> {
   }
 
   @override
-  User deserialize(
+  CurrentUser deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = UserBuilder();
+    final result = CurrentUserBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

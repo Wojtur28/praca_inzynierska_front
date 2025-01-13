@@ -46,7 +46,10 @@ Serializers _$serializers = (new Serializers().toBuilder()
           () => new ListBuilder<Platform>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(SteamReview)]),
-          () => new ListBuilder<SteamReview>()))
+          () => new ListBuilder<SteamReview>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

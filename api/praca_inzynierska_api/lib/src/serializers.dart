@@ -58,6 +58,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<GameRating>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(User)]),
+        () => ListBuilder<User>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SteamReview)]),
         () => ListBuilder<SteamReview>(),
       )

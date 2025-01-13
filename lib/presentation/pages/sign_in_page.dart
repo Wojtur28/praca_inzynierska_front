@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
+import '../../data/auth_storage.dart';
 import '../../domain/models/sign_in_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -33,8 +35,25 @@ class _SignInPageState extends State<SignInPage> {
       );
 
       final success = await authRepository.signIn(user);
+
       if (success) {
-        Navigator.pushReplacementNamed(context, '/games');
+        final authStorage = AuthStorage();
+        final token = await authStorage.getToken();
+        if (token == null || token.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Nie udało się pobrać tokenu JWT.')),
+          );
+          return;
+        }
+
+        final payloadMap = JwtDecoder.decode(token);
+
+        final List<dynamic> roles = payloadMap['roles'] ?? [];
+        if (roles.contains('ROLE_ADMIN')) {
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else {
+          Navigator.pushReplacementNamed(context, '/games');
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Logowanie nie powiodło się.')),
@@ -46,6 +65,7 @@ class _SignInPageState extends State<SignInPage> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
