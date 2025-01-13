@@ -16,11 +16,9 @@ class _$GameRatingAnswer extends GameRatingAnswer {
   @override
   final String? content;
   @override
-  final int? votesUp;
-  @override
-  final int? votesDown;
-  @override
   final DateTime? createdAt;
+  @override
+  final String? createdBy;
 
   factory _$GameRatingAnswer(
           [void Function(GameRatingAnswerBuilder)? updates]) =>
@@ -31,9 +29,8 @@ class _$GameRatingAnswer extends GameRatingAnswer {
       this.gameRating,
       this.user,
       this.content,
-      this.votesUp,
-      this.votesDown,
-      this.createdAt})
+      this.createdAt,
+      this.createdBy})
       : super._();
 
   @override
@@ -52,9 +49,8 @@ class _$GameRatingAnswer extends GameRatingAnswer {
         gameRating == other.gameRating &&
         user == other.user &&
         content == other.content &&
-        votesUp == other.votesUp &&
-        votesDown == other.votesDown &&
-        createdAt == other.createdAt;
+        createdAt == other.createdAt &&
+        createdBy == other.createdBy;
   }
 
   @override
@@ -64,9 +60,8 @@ class _$GameRatingAnswer extends GameRatingAnswer {
     _$hash = $jc(_$hash, gameRating.hashCode);
     _$hash = $jc(_$hash, user.hashCode);
     _$hash = $jc(_$hash, content.hashCode);
-    _$hash = $jc(_$hash, votesUp.hashCode);
-    _$hash = $jc(_$hash, votesDown.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdBy.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -78,9 +73,8 @@ class _$GameRatingAnswer extends GameRatingAnswer {
           ..add('gameRating', gameRating)
           ..add('user', user)
           ..add('content', content)
-          ..add('votesUp', votesUp)
-          ..add('votesDown', votesDown)
-          ..add('createdAt', createdAt))
+          ..add('createdAt', createdAt)
+          ..add('createdBy', createdBy))
         .toString();
   }
 }
@@ -107,17 +101,13 @@ class GameRatingAnswerBuilder
   String? get content => _$this._content;
   set content(String? content) => _$this._content = content;
 
-  int? _votesUp;
-  int? get votesUp => _$this._votesUp;
-  set votesUp(int? votesUp) => _$this._votesUp = votesUp;
-
-  int? _votesDown;
-  int? get votesDown => _$this._votesDown;
-  set votesDown(int? votesDown) => _$this._votesDown = votesDown;
-
   DateTime? _createdAt;
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
+
+  String? _createdBy;
+  String? get createdBy => _$this._createdBy;
+  set createdBy(String? createdBy) => _$this._createdBy = createdBy;
 
   GameRatingAnswerBuilder() {
     GameRatingAnswer._defaults(this);
@@ -130,9 +120,8 @@ class GameRatingAnswerBuilder
       _gameRating = $v.gameRating?.toBuilder();
       _user = $v.user?.toBuilder();
       _content = $v.content;
-      _votesUp = $v.votesUp;
-      _votesDown = $v.votesDown;
       _createdAt = $v.createdAt;
+      _createdBy = $v.createdBy;
       _$v = null;
     }
     return this;
@@ -161,9 +150,8 @@ class GameRatingAnswerBuilder
               gameRating: _gameRating?.build(),
               user: _user?.build(),
               content: content,
-              votesUp: votesUp,
-              votesDown: votesDown,
-              createdAt: createdAt);
+              createdAt: createdAt,
+              createdBy: createdBy);
     } catch (_) {
       late String _$failedField;
       try {

@@ -18,10 +18,6 @@ class _$GameRating extends GameRating {
   @override
   final String? content;
   @override
-  final int? votesUp;
-  @override
-  final int? votesDown;
-  @override
   final DateTime? createdAt;
 
   factory _$GameRating([void Function(GameRatingBuilder)? updates]) =>
@@ -33,8 +29,6 @@ class _$GameRating extends GameRating {
       this.user,
       this.rating,
       this.content,
-      this.votesUp,
-      this.votesDown,
       this.createdAt})
       : super._();
 
@@ -54,8 +48,6 @@ class _$GameRating extends GameRating {
         user == other.user &&
         rating == other.rating &&
         content == other.content &&
-        votesUp == other.votesUp &&
-        votesDown == other.votesDown &&
         createdAt == other.createdAt;
   }
 
@@ -67,8 +59,6 @@ class _$GameRating extends GameRating {
     _$hash = $jc(_$hash, user.hashCode);
     _$hash = $jc(_$hash, rating.hashCode);
     _$hash = $jc(_$hash, content.hashCode);
-    _$hash = $jc(_$hash, votesUp.hashCode);
-    _$hash = $jc(_$hash, votesDown.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -82,8 +72,6 @@ class _$GameRating extends GameRating {
           ..add('user', user)
           ..add('rating', rating)
           ..add('content', content)
-          ..add('votesUp', votesUp)
-          ..add('votesDown', votesDown)
           ..add('createdAt', createdAt))
         .toString();
   }
@@ -112,14 +100,6 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
   String? get content => _$this._content;
   set content(String? content) => _$this._content = content;
 
-  int? _votesUp;
-  int? get votesUp => _$this._votesUp;
-  set votesUp(int? votesUp) => _$this._votesUp = votesUp;
-
-  int? _votesDown;
-  int? get votesDown => _$this._votesDown;
-  set votesDown(int? votesDown) => _$this._votesDown = votesDown;
-
   DateTime? _createdAt;
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
@@ -136,8 +116,6 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
       _user = $v.user?.toBuilder();
       _rating = $v.rating;
       _content = $v.content;
-      _votesUp = $v.votesUp;
-      _votesDown = $v.votesDown;
       _createdAt = $v.createdAt;
       _$v = null;
     }
@@ -168,8 +146,6 @@ class GameRatingBuilder implements Builder<GameRating, GameRatingBuilder> {
               user: _user?.build(),
               rating: rating,
               content: content,
-              votesUp: votesUp,
-              votesDown: votesDown,
               createdAt: createdAt);
     } catch (_) {
       late String _$failedField;

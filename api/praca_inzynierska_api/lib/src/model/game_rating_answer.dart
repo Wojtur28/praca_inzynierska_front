@@ -17,9 +17,8 @@ part 'game_rating_answer.g.dart';
 /// * [gameRating]
 /// * [user]
 /// * [content] - Content of the answer.
-/// * [votesUp] - Number of upvotes for this answer.
-/// * [votesDown] - Number of downvotes for this answer.
 /// * [createdAt] - Timestamp when the answer was created.
+/// * [createdBy] - User who created the answer.
 @BuiltValue()
 abstract class GameRatingAnswer
     implements Built<GameRatingAnswer, GameRatingAnswerBuilder> {
@@ -37,17 +36,13 @@ abstract class GameRatingAnswer
   @BuiltValueField(wireName: r'content')
   String? get content;
 
-  /// Number of upvotes for this answer.
-  @BuiltValueField(wireName: r'votesUp')
-  int? get votesUp;
-
-  /// Number of downvotes for this answer.
-  @BuiltValueField(wireName: r'votesDown')
-  int? get votesDown;
-
   /// Timestamp when the answer was created.
   @BuiltValueField(wireName: r'createdAt')
   DateTime? get createdAt;
+
+  /// User who created the answer.
+  @BuiltValueField(wireName: r'createdBy')
+  String? get createdBy;
 
   GameRatingAnswer._();
 
@@ -103,25 +98,18 @@ class _$GameRatingAnswerSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.votesUp != null) {
-      yield r'votesUp';
-      yield serializers.serialize(
-        object.votesUp,
-        specifiedType: const FullType(int),
-      );
-    }
-    if (object.votesDown != null) {
-      yield r'votesDown';
-      yield serializers.serialize(
-        object.votesDown,
-        specifiedType: const FullType(int),
-      );
-    }
     if (object.createdAt != null) {
       yield r'createdAt';
       yield serializers.serialize(
         object.createdAt,
         specifiedType: const FullType(DateTime),
+      );
+    }
+    if (object.createdBy != null) {
+      yield r'createdBy';
+      yield serializers.serialize(
+        object.createdBy,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -177,26 +165,19 @@ class _$GameRatingAnswerSerializer
           ) as String;
           result.content = valueDes;
           break;
-        case r'votesUp':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.votesUp = valueDes;
-          break;
-        case r'votesDown':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.votesDown = valueDes;
-          break;
         case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
+          break;
+        case r'createdBy':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdBy = valueDes;
           break;
         default:
           unhandled.add(key);
