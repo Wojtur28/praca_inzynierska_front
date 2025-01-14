@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
-import '../../data/auth_storage.dart';
 import '../../domain/models/sign_in_user.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../main.dart';
 
 class SignInPage extends StatefulWidget {
   final Dio dio;
@@ -33,39 +32,36 @@ class _SignInPageState extends State<SignInPage> {
         email: emailController.text,
         password: passwordController.text,
       );
-
       final success = await authRepository.signIn(user);
-
       if (success) {
-        final authStorage = AuthStorage();
-        final token = await authStorage.getToken();
-        if (token == null || token.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nie udało się pobrać tokenu JWT.')),
-          );
-          return;
-        }
-
-        final payloadMap = JwtDecoder.decode(token);
-
-        final List<dynamic> roles = payloadMap['roles'] ?? [];
-        if (roles.contains('ROLE_ADMIN')) {
+        final admin = await authRepository.isAdmin();
+        isAdminNotifier.value = admin;
+        if (admin) {
           Navigator.pushReplacementNamed(context, '/admin');
         } else {
           Navigator.pushReplacementNamed(context, '/games');
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logowanie nie powiodło się.')),
+          const SnackBar(content: Text('Niepoprawny email lub hasło.')),
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Niepoprawny email lub hasło.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Błąd logowania.')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nieprawidłowy email lub hasło.')),
+        const SnackBar(content: Text('Niepoprawny email lub hasło.')),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -137,4 +133,3 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 }
-
