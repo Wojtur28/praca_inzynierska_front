@@ -23,9 +23,13 @@ class MainScaffold extends StatelessWidget {
         title: const Text('Praca inżynierska'),
         actions: [
           IconButton(
-            icon: Icon(currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
+            icon: Icon(
+              currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
+            ),
             onPressed: () {
-              onThemeChange(currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light);
+              onThemeChange(
+                currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+              );
             },
             tooltip: 'Przełącz motyw',
           ),
@@ -49,7 +53,6 @@ class MainScaffold extends StatelessWidget {
                   ],
                 ),
               );
-
               if (confirmed == true) {
                 onLogout();
               }
@@ -67,6 +70,13 @@ class MainScaffold extends StatelessWidget {
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profil'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/profile');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.videogame_asset),
