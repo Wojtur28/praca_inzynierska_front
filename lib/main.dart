@@ -5,6 +5,7 @@ import 'package:openapi_generator_annotations/openapi_generator_annotations.dart
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/profile_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
 import 'package:praca_inzynierska_front/presentation/widgets/main_scaffold.dart';
@@ -31,7 +32,6 @@ void main() async {
   }
 
   final authRepository = AuthRepository(dio);
-
   final userApi = UserApi(dio, standardSerializers);
 
   runApp(MyApp(
@@ -94,13 +94,9 @@ class _MyAppState extends State<MyApp> {
                 SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
             '/signup': (context) =>
                 SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
-            '/games': (context) => FutureBuilder<bool>(
-              future: widget.authRepository.isAdmin(),
-              builder: (context, snapshot) {
-                bool isAdmin = false;
-                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                  isAdmin = snapshot.data!;
-                }
+            '/games': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
@@ -118,13 +114,9 @@ class _MyAppState extends State<MyApp> {
                 );
               },
             ),
-            '/admin': (context) => FutureBuilder<bool>(
-              future: widget.authRepository.isAdmin(),
-              builder: (context, snapshot) {
-                bool isAdmin = false;
-                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                  isAdmin = snapshot.data!;
-                }
+            '/admin': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
@@ -135,6 +127,25 @@ class _MyAppState extends State<MyApp> {
                     Navigator.pushReplacementNamed(context, '/signin');
                   },
                   body: AdminPanelPage(
+                    dio: widget.dio,
+                    userApi: widget.userApi,
+                  ),
+                );
+              },
+            ),
+            '/profile': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  body: ProfilePage(
                     dio: widget.dio,
                     userApi: widget.userApi,
                   ),
