@@ -46,6 +46,7 @@ dependencies:
   url_launcher: ^6.1.7
   carousel_slider: ^5.0.0
   jwt_decoder: ^2.0.1
+  intl: ^0.20.1
 
 dev_dependencies:
   build_runner: ^2.3.3

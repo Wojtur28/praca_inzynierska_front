@@ -7,12 +7,14 @@ import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
+import 'package:praca_inzynierska_front/presentation/widgets/main_scaffold.dart';
 
 import 'auth/CustomAuthInterceptor.dart';
 import 'data/auth_storage.dart';
 import 'domain/repositories/auth_repository.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final ValueNotifier<bool> isAdminNotifier = ValueNotifier<bool>(false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,13 +94,52 @@ class _MyAppState extends State<MyApp> {
                 SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
             '/signup': (context) =>
                 SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
-            '/games': (context) => GamesPage(
-                dio: widget.dio,
-                themeNotifier: _themeNotifier,
-                authRepository: widget.authRepository),
-            '/admin': (context) => AdminPanelPage(
-              dio: widget.dio,
-              userApi: widget.userApi,
+            '/games': (context) => FutureBuilder<bool>(
+              future: widget.authRepository.isAdmin(),
+              builder: (context, snapshot) {
+                bool isAdmin = false;
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                  isAdmin = snapshot.data!;
+                }
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  body: GamesPage(
+                    dio: widget.dio,
+                    themeNotifier: _themeNotifier,
+                    authRepository: widget.authRepository,
+                  ),
+                );
+              },
+            ),
+            '/admin': (context) => FutureBuilder<bool>(
+              future: widget.authRepository.isAdmin(),
+              builder: (context, snapshot) {
+                bool isAdmin = false;
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                  isAdmin = snapshot.data!;
+                }
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  body: AdminPanelPage(
+                    dio: widget.dio,
+                    userApi: widget.userApi,
+                  ),
+                );
+              },
             ),
           },
         );

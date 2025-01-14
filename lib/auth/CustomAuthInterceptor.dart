@@ -10,9 +10,18 @@ class CustomAuthInterceptor extends Interceptor {
 
   CustomAuthInterceptor({required this.authStorage});
 
+  bool _isAuthEndpoint(String path) {
+    const authEndpoints = [
+      '/auth/signin',
+      '/auth/signup',
+    ];
+
+    return authEndpoints.any((endpoint) => path.contains(endpoint));
+  }
+
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
+    if (err.response?.statusCode == 401 && !_isAuthEndpoint(err.requestOptions.path)) {
       await authStorage.clearToken();
 
       if (navigatorKey.currentState?.context != null) {

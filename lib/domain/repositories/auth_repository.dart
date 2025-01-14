@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
 import '../models/sign_in_user.dart';
@@ -9,7 +10,7 @@ class AuthRepository {
   final Dio _dio;
   final AuthStorage _authStorage;
 
-  AuthRepository(this._dio): _authStorage = AuthStorage();
+  AuthRepository(this._dio) : _authStorage = AuthStorage();
 
   Future<bool> signIn(SignInUser user) async {
     final response = await _dio.post('/auth/signin', data: {
@@ -71,5 +72,20 @@ class AuthRepository {
       orElse: () => throw StateError('BearerAuthInterceptor not found'),
     ) as BearerAuthInterceptor;
     bearerAuthInterceptor.tokens.remove('bearerAuth');
+  }
+
+  Future<List<String>> getUserRoles() async {
+    final token = await _authStorage.getToken();
+    if (token == null || token.isEmpty) {
+      return [];
+    }
+    final payloadMap = JwtDecoder.decode(token);
+    final roles = payloadMap['roles'] ?? [];
+    return roles.cast<String>();
+  }
+
+  Future<bool> isAdmin() async {
+    final roles = await getUserRoles();
+    return roles.contains('ROLE_ADMIN');
   }
 }
