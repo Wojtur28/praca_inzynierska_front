@@ -10,6 +10,8 @@ doc/GameRatingAnswersApi.md
 doc/GameRatingsApi.md
 doc/Genre.md
 doc/Platform.md
+doc/Report.md
+doc/ReportApi.md
 doc/Screenshot.md
 doc/SteamGame.md
 doc/SteamGameDetail.md
@@ -27,6 +29,7 @@ lib/praca_inzynierska_api.dart
 lib/src/api.dart
 lib/src/api/game_rating_answers_api.dart
 lib/src/api/game_ratings_api.dart
+lib/src/api/report_api.dart
 lib/src/api/steam_games_api.dart
 lib/src/api/steam_reviews_api.dart
 lib/src/api/user_api.dart
@@ -46,6 +49,7 @@ lib/src/model/game_rating.dart
 lib/src/model/game_rating_answer.dart
 lib/src/model/genre.dart
 lib/src/model/platform.dart
+lib/src/model/report.dart
 lib/src/model/screenshot.dart
 lib/src/model/steam_game.dart
 lib/src/model/steam_game_detail.dart

@@ -21,6 +21,7 @@ import 'package:praca_inzynierska_api/src/model/game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
+import 'package:praca_inzynierska_api/src/model/report.dart';
 import 'package:praca_inzynierska_api/src/model/screenshot.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';
@@ -41,6 +42,7 @@ part 'serializers.g.dart';
   GameRatingAnswer,
   Genre,
   Platform,
+  Report,
   Screenshot,
   SteamGame,
   $SteamGame,
@@ -60,6 +62,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(User)]),
         () => ListBuilder<User>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(Report)]),
+        () => ListBuilder<Report>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SteamReview)]),

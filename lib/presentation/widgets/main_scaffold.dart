@@ -23,13 +23,9 @@ class MainScaffold extends StatelessWidget {
         title: const Text('Praca inżynierska'),
         actions: [
           IconButton(
-            icon: Icon(
-              currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
-            ),
+            icon: Icon(currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
             onPressed: () {
-              onThemeChange(
-                currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
-              );
+              onThemeChange(currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light);
             },
             tooltip: 'Przełącz motyw',
           ),
@@ -93,6 +89,13 @@ class MainScaffold extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/admin');
                 },
               ),
+            ListTile(
+              leading: const Icon(Icons.pie_chart),
+              title: const Text('Raporty'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/reports');
+              },
+            ),
           ],
         ),
       ),
