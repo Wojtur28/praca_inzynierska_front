@@ -11,6 +11,7 @@ import 'package:praca_inzynierska_api/src/auth/bearer_auth.dart';
 import 'package:praca_inzynierska_api/src/auth/oauth.dart';
 import 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 import 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
+import 'package:praca_inzynierska_api/src/api/report_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
 import 'package:praca_inzynierska_api/src/api/user_api.dart';
@@ -91,6 +92,12 @@ class PracaInzynierskaApi {
   /// by doing that all interceptors will not be executed
   GameRatingsApi getGameRatingsApi() {
     return GameRatingsApi(dio, serializers);
+  }
+
+  /// Get ReportApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ReportApi getReportApi() {
+    return ReportApi(dio, serializers);
   }
 
   /// Get SteamGamesApi instance, base route and serializer can be overridden by a given but be careful,

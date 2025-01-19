@@ -15,6 +15,8 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(GameRatingAnswer.serializer)
       ..add(Genre.serializer)
       ..add(Platform.serializer)
+      ..add(Report.serializer)
+      ..add(ReportDetails.serializer)
       ..add(Screenshot.serializer)
       ..add(SteamGameDetail.serializer)
       ..add(SteamGameWithDetails.serializer)
@@ -44,6 +46,18 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(Platform)]),
           () => new ListBuilder<Platform>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(SteamGame)]),
+          () => new ListBuilder<SteamGame>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(GameRating)]),
+          () => new ListBuilder<GameRating>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(SteamGame)]),
+          () => new ListBuilder<SteamGame>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(GameRating)]),
+          () => new ListBuilder<GameRating>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(SteamReview)]),
           () => new ListBuilder<SteamReview>())

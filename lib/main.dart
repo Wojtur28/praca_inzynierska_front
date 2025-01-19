@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-01-13T16:15:15.613883
+// Openapi Generator last run: : 2025-01-19T10:05:48.693031
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
@@ -13,6 +13,7 @@ import 'package:praca_inzynierska_front/presentation/widgets/main_scaffold.dart'
 import 'auth/CustomAuthInterceptor.dart';
 import 'data/auth_storage.dart';
 import 'domain/repositories/auth_repository.dart';
+import 'presentation/pages/report_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final ValueNotifier<bool> isAdminNotifier = ValueNotifier<bool>(false);
@@ -48,7 +49,7 @@ void main() async {
     pubName: 'praca_inzynierska_api',
     pubAuthor: 'Maciej Wojturski',
   ),
-  inputSpec: InputSpec(path: 'lib/swaggers/contract.yml'),
+  inputSpec: InputSpec(path: 'lib/contract/contract.yml'),
   generatorName: Generator.dio,
   runSourceGenOnOutput: true,
   outputDirectory: 'api/praca_inzynierska_api',
@@ -148,6 +149,25 @@ class _MyAppState extends State<MyApp> {
                   body: ProfilePage(
                     dio: widget.dio,
                     userApi: widget.userApi,
+                  ),
+                );
+              },
+            ),
+            '/reports': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  body: ReportsPage(
+                    dio: widget.dio,
+                    reportApi: ReportApi(widget.dio, standardSerializers),
                   ),
                 );
               },

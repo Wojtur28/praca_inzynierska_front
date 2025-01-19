@@ -14,11 +14,11 @@ class GamesPageContent extends StatefulWidget {
   final dynamic authRepository;
 
   const GamesPageContent({
-    Key? key,
+    super.key,
     required this.dio,
     required this.themeNotifier,
     required this.authRepository,
-  }) : super(key: key);
+  });
 
   @override
   State<GamesPageContent> createState() => _GamesPageContentState();
@@ -70,8 +70,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
         page: _currentPage,
         size: _pageSize,
         platform: _selectedPlatform,
-        categories: _selectedCategories.isNotEmpty ? BuiltList<String>(_selectedCategories).toList() : null,
-        genres: _selectedGenres.isNotEmpty ? BuiltList<String>(_selectedGenres).toList() : null,
+        categories: _selectedCategories.isNotEmpty ? _selectedCategories : null,
+        genres: _selectedGenres.isNotEmpty ? _selectedGenres : null,
         search: _searchQuery.isNotEmpty ? _searchQuery : null,
       );
       debugPrint('Fetched ${newGames.length} games');
@@ -98,7 +98,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Wiersz z polem wyszukiwania
           TextField(
             decoration: const InputDecoration(
               labelText: 'Szukaj gier',
@@ -116,7 +115,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
             },
           ),
           const SizedBox(height: 16),
-          // Wiersz z platformą i kategorią
           Row(
             children: [
               Expanded(
@@ -125,8 +123,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
                   hint: const Text('Platforma'),
                   isExpanded: true,
                   items: platforms
-                      .map((platform) =>
-                      DropdownMenuItem(value: platform, child: Text(platform)))
+                      .map((platform) => DropdownMenuItem(
+                      value: platform, child: Text(platform)))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
@@ -146,8 +144,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
                   hint: const Text('Kategoria'),
                   isExpanded: true,
                   items: allCategories
-                      .map((category) =>
-                      DropdownMenuItem(value: category, child: Text(category)))
+                      .map((category) => DropdownMenuItem(
+                      value: category, child: Text(category)))
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
@@ -165,7 +163,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
             ],
           ),
           const SizedBox(height: 16),
-          // Wiersz z gatunkiem i przyciskiem reset
           Row(
             children: [
               Expanded(
@@ -174,8 +171,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
                   hint: const Text('Gatunek'),
                   isExpanded: true,
                   items: allGenres
-                      .map((genre) =>
-                      DropdownMenuItem(value: genre, child: Text(genre)))
+                      .map((genre) => DropdownMenuItem(
+                      value: genre, child: Text(genre)))
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
@@ -243,8 +240,9 @@ class _GamesPageContentState extends State<GamesPageContent> {
     final genres = (game.genres?.map((g) => g.name).toList() ?? [])
         .take(3)
         .join(', ');
-    final platforms =
-    (game.platforms?.map((p) => p.name).toList() ?? []).take(3).join(', ');
+    final platforms = (game.platforms?.map((p) => p.name).toList() ?? [])
+        .take(3)
+        .join(', ');
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
@@ -289,45 +287,86 @@ class _GamesPageContentState extends State<GamesPageContent> {
                 if (platforms.isNotEmpty)
                   Text('Platformy: $platforms',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                const SizedBox(height: 8),
+                _buildReviewSentiment(game),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RatingsPage(
-                          dio: widget.dio,
-                          gameId: game.id!,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RatingsPage(
+                            dio: widget.dio,
+                            gameId: game.id!,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    child: const Text('Recenzje'),
                   ),
-                  child: const Text('Recenzje'),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    _showGameDetails(context, game);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showGameDetails(context, game);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    child: const Text('Szczegóły'),
                   ),
-                  child: const Text('Szczegóły'),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+
+  Widget _buildReviewSentiment(SteamGameWithDetails game) {
+    double? score = double.tryParse(game.reviewsScoreFancy ?? '');
+    String sentiment = "Recenzje: ";
+    Color color;
+    if (score == null) {
+      sentiment += 'Brak danych';
+      color = Colors.grey;
+    } else if (score < 0.4) {
+      sentiment += 'Przytłaczająco negatywne';
+      color = Colors.red;
+    } else if (score < 0.6) {
+      sentiment += 'Negatywne';
+      color = Colors.orange;
+    } else if (score < 0.8) {
+      sentiment += 'Pozytywne';
+      color = Colors.lightGreen;
+    } else {
+      sentiment += 'Przytłaczająco pozytywne';
+      color = Colors.green;
+    }
+    return Row(
+      children: [
+        Icon(Icons.circle, color: color, size: 16),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            sentiment,
+            style: TextStyle(color: color, fontSize: 14),
+          ),
+        ),
+      ],
     );
   }
 
