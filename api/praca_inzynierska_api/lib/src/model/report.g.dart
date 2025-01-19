@@ -18,6 +18,8 @@ class _$Report extends Report {
   @override
   final String? reportStatus;
   @override
+  final String? reportType;
+  @override
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
@@ -25,8 +27,6 @@ class _$Report extends Report {
   final BuiltList<SteamGame>? steamGames;
   @override
   final BuiltList<GameRating>? gameRatings;
-  @override
-  final BuiltList<User>? users;
 
   factory _$Report([void Function(ReportBuilder)? updates]) =>
       (new ReportBuilder()..update(updates))._build();
@@ -37,11 +37,11 @@ class _$Report extends Report {
       this.startDate,
       this.endDate,
       this.reportStatus,
+      this.reportType,
       this.createdAt,
       this.updatedAt,
       this.steamGames,
-      this.gameRatings,
-      this.users})
+      this.gameRatings})
       : super._();
 
   @override
@@ -60,11 +60,11 @@ class _$Report extends Report {
         startDate == other.startDate &&
         endDate == other.endDate &&
         reportStatus == other.reportStatus &&
+        reportType == other.reportType &&
         createdAt == other.createdAt &&
         updatedAt == other.updatedAt &&
         steamGames == other.steamGames &&
-        gameRatings == other.gameRatings &&
-        users == other.users;
+        gameRatings == other.gameRatings;
   }
 
   @override
@@ -75,11 +75,11 @@ class _$Report extends Report {
     _$hash = $jc(_$hash, startDate.hashCode);
     _$hash = $jc(_$hash, endDate.hashCode);
     _$hash = $jc(_$hash, reportStatus.hashCode);
+    _$hash = $jc(_$hash, reportType.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jc(_$hash, steamGames.hashCode);
     _$hash = $jc(_$hash, gameRatings.hashCode);
-    _$hash = $jc(_$hash, users.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -92,11 +92,11 @@ class _$Report extends Report {
           ..add('startDate', startDate)
           ..add('endDate', endDate)
           ..add('reportStatus', reportStatus)
+          ..add('reportType', reportType)
           ..add('createdAt', createdAt)
           ..add('updatedAt', updatedAt)
           ..add('steamGames', steamGames)
-          ..add('gameRatings', gameRatings)
-          ..add('users', users))
+          ..add('gameRatings', gameRatings))
         .toString();
   }
 }
@@ -124,6 +124,10 @@ class ReportBuilder implements Builder<Report, ReportBuilder> {
   String? get reportStatus => _$this._reportStatus;
   set reportStatus(String? reportStatus) => _$this._reportStatus = reportStatus;
 
+  String? _reportType;
+  String? get reportType => _$this._reportType;
+  set reportType(String? reportType) => _$this._reportType = reportType;
+
   DateTime? _createdAt;
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
@@ -144,10 +148,6 @@ class ReportBuilder implements Builder<Report, ReportBuilder> {
   set gameRatings(ListBuilder<GameRating>? gameRatings) =>
       _$this._gameRatings = gameRatings;
 
-  ListBuilder<User>? _users;
-  ListBuilder<User> get users => _$this._users ??= new ListBuilder<User>();
-  set users(ListBuilder<User>? users) => _$this._users = users;
-
   ReportBuilder() {
     Report._defaults(this);
   }
@@ -160,11 +160,11 @@ class ReportBuilder implements Builder<Report, ReportBuilder> {
       _startDate = $v.startDate;
       _endDate = $v.endDate;
       _reportStatus = $v.reportStatus;
+      _reportType = $v.reportType;
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
       _steamGames = $v.steamGames?.toBuilder();
       _gameRatings = $v.gameRatings?.toBuilder();
-      _users = $v.users?.toBuilder();
       _$v = null;
     }
     return this;
@@ -194,11 +194,11 @@ class ReportBuilder implements Builder<Report, ReportBuilder> {
               startDate: startDate,
               endDate: endDate,
               reportStatus: reportStatus,
+              reportType: reportType,
               createdAt: createdAt,
               updatedAt: updatedAt,
               steamGames: _steamGames?.build(),
-              gameRatings: _gameRatings?.build(),
-              users: _users?.build());
+              gameRatings: _gameRatings?.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -206,8 +206,6 @@ class ReportBuilder implements Builder<Report, ReportBuilder> {
         _steamGames?.build();
         _$failedField = 'gameRatings';
         _gameRatings?.build();
-        _$failedField = 'users';
-        _users?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             r'Report', _$failedField, e.toString());

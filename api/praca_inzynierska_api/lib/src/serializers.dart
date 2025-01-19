@@ -22,6 +22,7 @@ import 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
 import 'package:praca_inzynierska_api/src/model/report.dart';
+import 'package:praca_inzynierska_api/src/model/report_details.dart';
 import 'package:praca_inzynierska_api/src/model/screenshot.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';
@@ -43,6 +44,7 @@ part 'serializers.g.dart';
   Genre,
   Platform,
   Report,
+  ReportDetails,
   Screenshot,
   SteamGame,
   $SteamGame,

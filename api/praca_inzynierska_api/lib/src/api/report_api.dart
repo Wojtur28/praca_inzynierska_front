@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/src/api_util.dart';
 import 'package:praca_inzynierska_api/src/model/report.dart';
+import 'package:praca_inzynierska_api/src/model/report_details.dart';
 
 class ReportApi {
   final Dio _dio;
@@ -188,9 +189,9 @@ class ReportApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [Report] as data
+  /// Returns a [Future] containing a [Response] with a [ReportDetails] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<Report>> getReport({
+  Future<Response<ReportDetails>> getReport({
     required String reportId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -229,7 +230,7 @@ class ReportApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    Report? _responseData;
+    ReportDetails? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -237,8 +238,8 @@ class ReportApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(Report),
-            ) as Report;
+              specifiedType: const FullType(ReportDetails),
+            ) as ReportDetails;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -249,7 +250,7 @@ class ReportApi {
       );
     }
 
-    return Response<Report>(
+    return Response<ReportDetails>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -351,5 +352,56 @@ class ReportApi {
       statusMessage: _response.statusMessage,
       extra: _response.extra,
     );
+  }
+
+  /// Refresh reports cache
+  ///
+  ///
+  /// Parameters:
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> refreshReportsCache({
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/reports/refresh';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
   }
 }

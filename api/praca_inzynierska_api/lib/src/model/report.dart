@@ -7,7 +7,6 @@ import 'package:praca_inzynierska_api/src/model/game_rating.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:praca_inzynierska_api/src/model/date.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game.dart';
-import 'package:praca_inzynierska_api/src/model/user.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -21,11 +20,11 @@ part 'report.g.dart';
 /// * [startDate] - Start date of the report.
 /// * [endDate] - End date of the report.
 /// * [reportStatus] - Status of the report.
+/// * [reportType] - Type of the report.
 /// * [createdAt] - Timestamp when the report was created.
 /// * [updatedAt] - Timestamp when the report was last updated.
 /// * [steamGames] - List of Steam games included in the report.
 /// * [gameRatings] - List of game ratings included in the report.
-/// * [users] - List of users included in the report.
 @BuiltValue()
 abstract class Report implements Built<Report, ReportBuilder> {
   /// Unique identifier of the report.
@@ -48,6 +47,10 @@ abstract class Report implements Built<Report, ReportBuilder> {
   @BuiltValueField(wireName: r'reportStatus')
   String? get reportStatus;
 
+  /// Type of the report.
+  @BuiltValueField(wireName: r'reportType')
+  String? get reportType;
+
   /// Timestamp when the report was created.
   @BuiltValueField(wireName: r'createdAt')
   DateTime? get createdAt;
@@ -63,10 +66,6 @@ abstract class Report implements Built<Report, ReportBuilder> {
   /// List of game ratings included in the report.
   @BuiltValueField(wireName: r'gameRatings')
   BuiltList<GameRating>? get gameRatings;
-
-  /// List of users included in the report.
-  @BuiltValueField(wireName: r'users')
-  BuiltList<User>? get users;
 
   Report._();
 
@@ -126,6 +125,13 @@ class _$ReportSerializer implements PrimitiveSerializer<Report> {
         specifiedType: const FullType(String),
       );
     }
+    if (object.reportType != null) {
+      yield r'reportType';
+      yield serializers.serialize(
+        object.reportType,
+        specifiedType: const FullType(String),
+      );
+    }
     if (object.createdAt != null) {
       yield r'createdAt';
       yield serializers.serialize(
@@ -152,13 +158,6 @@ class _$ReportSerializer implements PrimitiveSerializer<Report> {
       yield serializers.serialize(
         object.gameRatings,
         specifiedType: const FullType(BuiltList, [FullType(GameRating)]),
-      );
-    }
-    if (object.users != null) {
-      yield r'users';
-      yield serializers.serialize(
-        object.users,
-        specifiedType: const FullType(BuiltList, [FullType(User)]),
       );
     }
   }
@@ -221,6 +220,13 @@ class _$ReportSerializer implements PrimitiveSerializer<Report> {
           ) as String;
           result.reportStatus = valueDes;
           break;
+        case r'reportType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.reportType = valueDes;
+          break;
         case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
@@ -248,13 +254,6 @@ class _$ReportSerializer implements PrimitiveSerializer<Report> {
             specifiedType: const FullType(BuiltList, [FullType(GameRating)]),
           ) as BuiltList<GameRating>;
           result.gameRatings.replace(valueDes);
-          break;
-        case r'users':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [FullType(User)]),
-          ) as BuiltList<User>;
-          result.users.replace(valueDes);
           break;
         default:
           unhandled.add(key);

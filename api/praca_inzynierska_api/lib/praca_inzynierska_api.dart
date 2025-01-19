@@ -26,6 +26,7 @@ export 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
 export 'package:praca_inzynierska_api/src/model/genre.dart';
 export 'package:praca_inzynierska_api/src/model/platform.dart';
 export 'package:praca_inzynierska_api/src/model/report.dart';
+export 'package:praca_inzynierska_api/src/model/report_details.dart';
 export 'package:praca_inzynierska_api/src/model/screenshot.dart';
 export 'package:praca_inzynierska_api/src/model/steam_game.dart';
 export 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';

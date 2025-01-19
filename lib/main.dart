@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-01-16T07:31:23.435714
+// Openapi Generator last run: : 2025-01-19T10:05:48.693031
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
@@ -49,7 +49,7 @@ void main() async {
     pubName: 'praca_inzynierska_api',
     pubAuthor: 'Maciej Wojturski',
   ),
-  inputSpec: InputSpec(path: 'lib/swaggers/contract.yml'),
+  inputSpec: InputSpec(path: 'lib/contract/contract.yml'),
   generatorName: Generator.dio,
   runSourceGenOnOutput: true,
   outputDirectory: 'api/praca_inzynierska_api',

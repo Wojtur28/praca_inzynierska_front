@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
 import 'package:intl/intl.dart';
+import 'package:praca_inzynierska_front/presentation/pages/report_details_page.dart';
+
+enum ReportType { rating, game }
 
 class ReportsPage extends StatefulWidget {
   final Dio dio;
@@ -23,7 +26,7 @@ class _ReportsPageState extends State<ReportsPage> {
   bool isLoading = true;
   BuiltList<Report>? reports;
   int currentPage = 0;
-  final int pageSize = 10;
+  final int pageSize = 5;
   int? sortColumnIndex;
   bool isAscending = true;
   final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
@@ -36,18 +39,45 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 
   Future<void> _fetchReports() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
-      final response = await widget.reportApi.getReports(page: currentPage, size: pageSize);
-      setState(() {
-        reports = response.data;
-        isLoading = false;
-      });
+      final response =
+      await widget.reportApi.getReports(page: currentPage, size: pageSize);
+      final fetchedReports = response.data;
+      if ((fetchedReports == null || fetchedReports.isEmpty) && currentPage > 0) {
+        setState(() {
+          currentPage--;
+        });
+        await _fetchReports();
+      } else {
+        setState(() {
+          reports = BuiltList<Report>(fetchedReports ?? []);
+          isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd pobierania raportów: $e')));
+    }
+  }
+
+  Future<void> _refreshReports() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await widget.reportApi.refreshReportsCache();
+      await _fetchReports();
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Błąd pobierania raportów: $e')));
+          .showSnackBar(const SnackBar(content: Text('Raporty zostały odświeżone.')));
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Błąd odświeżania raportów: $e')));
     }
   }
 
@@ -83,7 +113,8 @@ class _ReportsPageState extends State<ReportsPage> {
             label: const Text('Data startu'),
             onSort: (index, ascending) {
               _sort<DateTime>(
-                    (report) => report.startDate != null ? report.startDate!.toDateTime() : DateTime(1900),
+                    (report) =>
+                report.startDate != null ? report.startDate!.toDateTime() : DateTime(1900),
                 index,
                 ascending,
               );
@@ -93,7 +124,8 @@ class _ReportsPageState extends State<ReportsPage> {
             label: const Text('Data końca'),
             onSort: (index, ascending) {
               _sort<DateTime>(
-                    (report) => report.endDate != null ? report.endDate!.toDateTime() : DateTime(1900),
+                    (report) =>
+                report.endDate != null ? report.endDate!.toDateTime() : DateTime(1900),
                 index,
                 ascending,
               );
@@ -102,11 +134,7 @@ class _ReportsPageState extends State<ReportsPage> {
           DataColumn(
             label: const Text('Status'),
             onSort: (index, ascending) {
-              _sort<String>(
-                    (report) => report.reportStatus ?? '',
-                index,
-                ascending,
-              );
+              _sort<String>((report) => report.reportStatus ?? '', index, ascending);
             },
           ),
           DataColumn(
@@ -141,17 +169,42 @@ class _ReportsPageState extends State<ReportsPage> {
                 ? dateFormat.format(report.endDate!.toDateTime())
                 : '-')),
             DataCell(Text(report.reportStatus ?? '-')),
-            DataCell(Text(report.createdAt != null ? dateTimeFormat.format(report.createdAt!) : '-')),
-            DataCell(Text(report.updatedAt != null ? dateTimeFormat.format(report.updatedAt!) : '-')),
+            DataCell(Text(report.createdAt != null
+                ? dateTimeFormat.format(report.createdAt!)
+                : '-')),
+            DataCell(Text(report.updatedAt != null
+                ? dateTimeFormat.format(report.updatedAt!)
+                : '-')),
             DataCell(
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                tooltip: 'Usuń raport',
-                onPressed: () {
-                  if (report.id != null) {
-                    _deleteReport(report.id!);
-                  }
-                },
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      if (report.id != null) {
+                        _deleteReport(report.id!);
+                      }
+                    },
+                  ),
+                  if (report.reportStatus == 'FINISHED')
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward, color: Colors.blue),
+                      onPressed: () {
+                        if (report.id != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReportDetailPage(
+                                dio: widget.dio,
+                                reportApi: widget.reportApi,
+                                reportId: report.id!,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
               ),
             ),
           ]);
@@ -197,115 +250,152 @@ class _ReportsPageState extends State<ReportsPage> {
     final nameController = TextEditingController();
     DateTime? startDate;
     DateTime? endDate;
+    ReportType selectedReportType = ReportType.rating;
     final formKey = GlobalKey<FormState>();
 
     await showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: const Text('Stwórz nowy raport'),
-              content: Form(
-                key: formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: nameController,
-                        decoration: const InputDecoration(labelText: 'Nazwa raportu'),
-                        validator: (value) => value == null || value.isEmpty ? 'Wprowadź nazwę raportu' : null,
+        return StatefulBuilder(builder: (context, setStateDialog) {
+          return AlertDialog(
+            title: const Text('Stwórz nowy raport'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Nazwa raportu'),
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Wprowadź nazwę raportu' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        startDate == null
+                            ? 'Wybierz datę początkową'
+                            : 'Start: ${dateFormat.format(startDate!)}',
                       ),
-                      const SizedBox(height: 16),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          startDate == null
-                              ? 'Wybierz datę początkową'
-                              : 'Start: ${startDate!.toLocal().toString().split(" ")[0]}',
-                        ),
-                        trailing: const Icon(Icons.calendar_today),
-                        onTap: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setStateDialog(() {
+                            startDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        endDate == null
+                            ? 'Wybierz datę końcową'
+                            : 'Koniec: ${dateFormat.format(endDate!)}',
+                      ),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setStateDialog(() {
+                            endDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Wybierz typ raportu'),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Raport ocen'),
+                      leading: Radio<ReportType>(
+                        value: ReportType.rating,
+                        groupValue: selectedReportType,
+                        onChanged: (ReportType? value) {
+                          if (value != null) {
                             setStateDialog(() {
-                              startDate = picked;
+                              selectedReportType = value;
                             });
                           }
                         },
                       ),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          endDate == null
-                              ? 'Wybierz datę końcową'
-                              : 'Koniec: ${endDate!.toLocal().toString().split(" ")[0]}',
-                        ),
-                        trailing: const Icon(Icons.calendar_today),
-                        onTap: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Raport gier'),
+                      leading: Radio<ReportType>(
+                        value: ReportType.game,
+                        groupValue: selectedReportType,
+                        onChanged: (ReportType? value) {
+                          if (value != null) {
                             setStateDialog(() {
-                              endDate = picked;
+                              selectedReportType = value;
                             });
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
-                      if (startDate != null || endDate != null)
-                        Text(
-                          'Wybrane daty: ${startDate != null ? startDate!.toLocal().toString().split(" ")[0] : "-"} - ${endDate != null ? endDate!.toLocal().toString().split(" ")[0] : "-"}',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (startDate != null || endDate != null)
+                      Text(
+                        'Wybrane daty: ${startDate != null ? dateFormat.format(startDate!) : "-"} - ${endDate != null ? dateFormat.format(endDate!) : "-"}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                  ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Anuluj'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (formKey.currentState!.validate() && startDate != null && endDate != null) {
-                      final report = Report((b) => b
-                        ..name = nameController.text
-                        ..startDate = startDate!.toDate()
-                        ..endDate = endDate!.toDate());
-                      try {
-                        Navigator.of(context).pop();
-                        await widget.reportApi.createReport(report: report);
-                        await _fetchReports();
-                      } catch (e) {
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Błąd tworzenia raportu: $e')),
-                        );
-                      }
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Anuluj'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate() && startDate != null && endDate != null) {
+                    final report = Report((b) => b
+                      ..name = nameController.text
+                      ..startDate = startDate!.toDate()
+                      ..endDate = endDate!.toDate()
+                      ..reportStatus = 'IN_PROGRESS'
+                      ..reportType = selectedReportType == ReportType.rating ? 'RATING' : 'GAME'
+                    );
+                    try {
+                      Navigator.of(context).pop();
+                      await widget.reportApi.createReport(report: report);
+                      await _fetchReports();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Raport został stworzony.')),
+                      );
+                    } catch (e) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Błąd tworzenia raportu: $e')),
+                      );
                     }
-                  },
-                  child: const Text('Stwórz'),
-                ),
-              ],
-            );
-          },
-        );
+                  }
+                },
+                child: const Text('Stwórz'),
+              ),
+            ],
+          );
+        });
       },
     );
   }
-
 
   Widget _buildPaginationControls() {
     return Row(
@@ -345,31 +435,48 @@ class _ReportsPageState extends State<ReportsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Raporty'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Odśwież',
-            onPressed: _fetchReports,
-          )
-        ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : (reports == null || reports!.isEmpty)
-          ? const Center(child: Text('Brak raportów'))
-          : Column(
+      body: Stack(
         children: [
-          Expanded(child: _buildDataTable()),
-          _buildPaginationControls(),
-          const SizedBox(height: 16),
+          isLoading
+              ? const SizedBox.shrink()
+              : (reports == null || reports!.isEmpty)
+              ? const Center(child: Text('Brak raportów'))
+              : Column(
+            children: [
+              Expanded(child: _buildDataTable()),
+              _buildPaginationControls(),
+              const SizedBox(height: 16),
+            ],
+          ),
+          if (isLoading)
+            Container(
+              color: Colors.black54,
+              child: const Center(child: CircularProgressIndicator()),
+            ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createReport,
-        tooltip: 'Stwórz raport',
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              heroTag: 'refresh',
+              onPressed: _refreshReports,
+              tooltip: 'Odśwież raporty',
+              child: const Icon(Icons.refresh),
+            ),
+            const SizedBox(width: 16),
+            FloatingActionButton(
+              heroTag: 'add',
+              onPressed: _createReport,
+              tooltip: 'Stwórz raport',
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-

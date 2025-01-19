@@ -51,9 +51,9 @@ class _RatingsPageState extends State<RatingsPage> {
 
     if (token != null) {
       _currentUserId = _extractUserIdFromToken(token);
-      print('Extracted User ID: $_currentUserId');
+      debugPrint('Extracted User ID: $_currentUserId');
     } else {
-      print('No token found');
+      debugPrint('No token found');
     }
   }
 
@@ -65,16 +65,13 @@ class _RatingsPageState extends State<RatingsPage> {
       final payload = parts[1];
       final decoded = utf8.decode(base64Url.decode(base64Url.normalize(payload)));
       final json = jsonDecode(decoded);
-
-      print('Decoded JWT Payload: $json');
+      debugPrint('Decoded JWT Payload: $json');
       return json['userId'];
     } catch (e) {
-      print('Error extracting userId from token: $e');
+      debugPrint('Error extracting userId from token: $e');
       return null;
     }
   }
-
-
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
@@ -106,7 +103,7 @@ class _RatingsPageState extends State<RatingsPage> {
         if (_ratings == null) {
           _ratings = newRatings;
         } else {
-          _ratings = _ratings!.rebuild((b) => b.addAll(newRatings));
+          _ratings = _ratings!.rebuild((b) => b..addAll(newRatings));
         }
         _hasMore = newRatings.isNotEmpty;
       });
@@ -125,8 +122,8 @@ class _RatingsPageState extends State<RatingsPage> {
     final content = _contentController.text.trim();
 
     if (content.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Treść recenzji nie może być pusta')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Treść recenzji nie może być pusta')));
       return;
     }
 
@@ -146,8 +143,7 @@ class _RatingsPageState extends State<RatingsPage> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Recenzja została dodana')),
-      );
+          const SnackBar(content: Text('Recenzja została dodana')));
 
       _contentController.clear();
       _ratingValue = 5;
@@ -158,8 +154,7 @@ class _RatingsPageState extends State<RatingsPage> {
       _fetchRatings();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas dodawania recenzji: $e')),
-      );
+          SnackBar(content: Text('Błąd podczas dodawania recenzji: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -167,20 +162,21 @@ class _RatingsPageState extends State<RatingsPage> {
     }
   }
 
+  // Używamy ujednoliconego endpointu z parametrem votableType.
   Future<void> _voteOnRating(String ratingId, bool isUpvote) async {
     try {
-      final vote = Vote((b) => b
-        ..voteType = isUpvote ? 'UP' : 'DOWN');
+      final vote = Vote((b) => b..voteType = isUpvote ? 'UP' : 'DOWN');
 
+      // Zakładamy, że VotesApi posiada metodę voteOnVotable
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      await voteApi.voteOnGameRating(
-        ratingId: ratingId,
+      await voteApi.vote(
+        votableType: 'RATING',
+        votableId: ratingId,
         vote: vote,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')),
-      );
+          SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -191,34 +187,30 @@ class _RatingsPageState extends State<RatingsPage> {
     } on DioError catch (e) {
       if (e.response?.statusCode == 409) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Już głosowałeś na tę recenzję!')),
-        );
+            const SnackBar(content: Text('Już głosowałeś na tę recenzję!')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
   Future<void> _voteOnComment(String commentId, bool isUpvote) async {
     try {
-      final vote = Vote((b) => b
-        ..voteType = isUpvote ? 'UP' : 'DOWN');
+      final vote = Vote((b) => b..voteType = isUpvote ? 'UP' : 'DOWN');
 
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      await voteApi.voteOnGameRatingAnswer(
-        answerId: commentId,
+      await voteApi.vote(
+        votableType: 'ANSWER',
+        votableId: commentId,
         vote: vote,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')),
-      );
+          SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -229,17 +221,14 @@ class _RatingsPageState extends State<RatingsPage> {
     } on DioError catch (e) {
       if (e.response?.statusCode == 409) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Już głosowałeś na ten komentarz!')),
-        );
+            const SnackBar(content: Text('Już głosowałeś na ten komentarz!')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
@@ -252,35 +241,36 @@ class _RatingsPageState extends State<RatingsPage> {
     }
 
     try {
-      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
-      final createComment = CreateGameRatingAnswer((b) => b..content = content);
+      final gameRatingAnswersApi =
+      GameRatingAnswersApi(widget.dio, standardSerializers);
+      final createComment =
+      CreateGameRatingAnswer((b) => b..content = content);
 
       await gameRatingAnswersApi.createGameRatingAnswer(
         ratingId: ratingId,
         createGameRatingAnswer: createComment,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Komentarz został dodany')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Komentarz został dodany')));
 
-      setState(() {});
+      setState(() {}); // Odświeżenie widoku – opcjonalnie możesz bardziej selektywnie aktualizować komentarze
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')));
     }
   }
 
   Future<BuiltList<GameRatingAnswer>> _fetchComments(String ratingId) async {
     try {
-      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
-      final response = await gameRatingAnswersApi.getGameRatingAnswers(ratingId: ratingId);
+      final gameRatingAnswersApi =
+      GameRatingAnswersApi(widget.dio, standardSerializers);
+      final response =
+      await gameRatingAnswersApi.getGameRatingAnswers(ratingId: ratingId);
       return response.data ?? BuiltList<GameRatingAnswer>();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')));
       return BuiltList();
     }
   }
@@ -288,14 +278,14 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<VoteCount> _fetchVotesForRating(String ratingId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response = await voteApi.getVotesForGameRating(ratingId: ratingId);
+      final response =
+      await voteApi.getVoteCount(votableType: 'RATING', votableId: ratingId);
       return response.data ?? VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas pobierania głosów dla recenzji: $e')),
-      );
+          SnackBar(content: Text('Błąd podczas pobierania głosów dla recenzji: $e')));
       return VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
@@ -305,14 +295,14 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<VoteCount> _fetchVotesForAnswer(String answerId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response = await voteApi.getVotesForGameRatingAnswer(answerId: answerId);
+      final response =
+      await voteApi.getVoteCount(votableType: 'ANSWER', votableId: answerId);
       return response.data ?? VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')),
-      );
+          SnackBar(content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')));
       return VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
@@ -328,8 +318,7 @@ class _RatingsPageState extends State<RatingsPage> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Recenzja została usunięta')),
-      );
+          const SnackBar(content: Text('Recenzja została usunięta')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -338,40 +327,35 @@ class _RatingsPageState extends State<RatingsPage> {
       });
       await _fetchRatings();
     } on DioError catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+          SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
   Future<void> _deleteComment(String ratingId, String commentId) async {
     try {
-      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
+      final gameRatingAnswersApi =
+      GameRatingAnswersApi(widget.dio, standardSerializers);
       await gameRatingAnswersApi.deleteGameRatingAnswer(
         ratingId: ratingId,
         answerId: commentId,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Komentarz został usunięty')),
-      );
+          const SnackBar(content: Text('Komentarz został usunięty')));
 
       setState(() {});
     } on DioError catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+          SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
-
 
   Future<void> _updateGameRating(String gameId, String ratingId, GameRating updatedRating) async {
     try {
@@ -383,8 +367,7 @@ class _RatingsPageState extends State<RatingsPage> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Recenzja została zaktualizowana')),
-      );
+          const SnackBar(content: Text('Recenzja została zaktualizowana')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -395,17 +378,14 @@ class _RatingsPageState extends State<RatingsPage> {
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie możesz edytować recenzji innego użytkownika')),
-        );
+            const SnackBar(content: Text('Nie możesz edytować recenzji innego użytkownika')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
@@ -419,8 +399,7 @@ class _RatingsPageState extends State<RatingsPage> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Odpowiedź została zaktualizowana')),
-      );
+          const SnackBar(content: Text('Odpowiedź została zaktualizowana')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -431,17 +410,14 @@ class _RatingsPageState extends State<RatingsPage> {
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie możesz edytować odpowiedzi innego użytkownika')),
-        );
+            const SnackBar(content: Text('Nie możesz edytować odpowiedzi innego użytkownika')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nieoczekiwany błąd: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
@@ -470,8 +446,7 @@ class _RatingsPageState extends State<RatingsPage> {
                 final content = controller.text.trim();
                 if (content.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Treść nie może być pusta')),
-                  );
+                      const SnackBar(content: Text('Treść nie może być pusta')));
                 } else {
                   Navigator.pop(context, content);
                 }
@@ -484,77 +459,32 @@ class _RatingsPageState extends State<RatingsPage> {
     );
   }
 
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recenzje gry'),
-      ),
-      body: Column(
-        children: [
-          _buildSortDropdown(),
-          _buildAddRatingForm(),
-          Expanded(
-            child: _isLoading && (_ratings == null || _ratings!.isEmpty)
-                ? const Center(child: CircularProgressIndicator())
-                  : _errorMessage != null
-                ? Center(child: Text(_errorMessage!))
-                : _buildRatingsList(_ratings!),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddRatingForm() {
+  Widget _buildSortDropdown() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          const Text(
-            'Dodaj swoją recenzję',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Text('Ocena:'),
-              const SizedBox(width: 8),
-              DropdownButton<int>(
-                value: _ratingValue,
-                items: List.generate(10, (index) => index + 1)
-                    .map((value) => DropdownMenuItem(
-                  value: value,
-                  child: Text('$value/10'),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _ratingValue = value!;
-                  });
-                },
-              ),
+          const Text('Sortuj według:'),
+          const SizedBox(width: 8),
+          DropdownButton<String>(
+            value: _selectedSort,
+            items: const [
+              DropdownMenuItem(value: 'createdAt_desc', child: Text('Najnowsze')),
+              DropdownMenuItem(value: 'createdAt_asc', child: Text('Najstarsze')),
+              DropdownMenuItem(value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
+              DropdownMenuItem(value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
+              DropdownMenuItem(value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
+              DropdownMenuItem(value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
             ],
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _contentController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Treść recenzji',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: _addRating,
-              child: const Text('Dodaj recenzję'),
-            ),
+            onChanged: (value) {
+              setState(() {
+                _selectedSort = value!;
+                _ratings = BuiltList<GameRating>();
+                _currentPage = 0;
+                _hasMore = true;
+                _fetchRatings();
+              });
+            },
           ),
         ],
       ),
@@ -643,46 +573,58 @@ class _RatingsPageState extends State<RatingsPage> {
                           children: comments.map((comment) {
                             final isCommentOwner = comment.createdBy == _currentUserId;
 
-                            return ListTile(
-                              title: Text(comment.content ?? 'Brak treści'),
-                              subtitle: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      if (isCommentOwner)
+                            return FutureBuilder<VoteCount>(
+                              future: _fetchVotesForAnswer(comment.id!),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Text('Błąd: ${snapshot.error}');
+                                } else {
+                                  final commentVotes = snapshot.data!;
+                                  return ListTile(
+                                    title: Text(comment.content ?? 'Brak treści'),
+                                    subtitle: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
                                         Row(
                                           children: [
+                                            if (isCommentOwner)
+                                              Row(
+                                                children: [
+                                                  IconButton(
+                                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                                    onPressed: () async {
+                                                      final updatedContent = await _showEditDialog(context, comment.content ?? '');
+                                                      if (updatedContent != null) {
+                                                        final updatedAnswer = comment.rebuild((b) => b..content = updatedContent);
+                                                        await _updateGameRatingAnswer(rating.id!, comment.id!, updatedAnswer);
+                                                      }
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                                    onPressed: () => _deleteComment(rating.id!, comment.id!),
+                                                  ),
+                                                ],
+                                              ),
                                             IconButton(
-                                              icon: const Icon(Icons.edit, color: Colors.blue),
-                                              onPressed: () async {
-                                                final updatedContent = await _showEditDialog(context, comment.content ?? '');
-                                                if (updatedContent != null) {
-                                                  final updatedAnswer = comment.rebuild((b) => b..content = updatedContent);
-                                                  await _updateGameRatingAnswer(rating.id!, comment.id!, updatedAnswer);
-                                                }
-                                              },
+                                              icon: const Icon(Icons.thumb_up, color: Colors.green),
+                                              onPressed: () => _voteOnComment(comment.id!, true),
                                             ),
+                                            Text('${commentVotes.upvotes}'),
                                             IconButton(
-                                              icon: const Icon(Icons.delete, color: Colors.red),
-                                              onPressed: () => _deleteComment(rating.id!, comment.id!),
+                                              icon: const Icon(Icons.thumb_down, color: Colors.red),
+                                              onPressed: () => _voteOnComment(comment.id!, false),
                                             ),
+                                            Text('${commentVotes.downvotes}'),
                                           ],
                                         ),
-                                      IconButton(
-                                        icon: const Icon(Icons.thumb_up, color: Colors.green),
-                                        onPressed: () => _voteOnComment(comment.id!, true),
-                                      ),
-                                      Text('${votes.upvotes}'),
-                                      IconButton(
-                                        icon: const Icon(Icons.thumb_down, color: Colors.red),
-                                        onPressed: () => _voteOnComment(comment.id!, false),
-                                      ),
-                                      Text('${votes.downvotes}'),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
                             );
                           }).toList(),
                         );
@@ -708,139 +650,75 @@ class _RatingsPageState extends State<RatingsPage> {
     );
   }
 
-
-
-  Widget _buildComments(GameRating rating) {
-    return FutureBuilder<BuiltList<GameRatingAnswer>>(
-      future: _fetchComments(rating.id!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Text('Błąd: ${snapshot.error}');
-        } else {
-          final comments = snapshot.data ?? BuiltList();
-          return Column(
+  Widget _buildAddRatingForm() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Dodaj swoją recenzję',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Row(
             children: [
-              ...comments.map((comment) {
-                final isCommentOwner = comment.createdBy == _currentUserId;
-
-                return FutureBuilder<VoteCount>(
-                  future: _fetchVotesForAnswer(comment.id!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Text('Błąd: ${snapshot.error}');
-                    } else {
-                      final votes = snapshot.data!;
-                      return ListTile(
-                        title: Text(comment.content ?? 'Brak treści'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Autor: ${comment.user?.email ?? "Nieznany"}'),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    if (isCommentOwner)
-                                      IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.blue),
-                                        onPressed: () async {
-                                          final updatedContent =
-                                          await _showEditDialog(context, comment.content ?? '');
-                                          if (updatedContent != null) {
-                                            final updatedAnswer =
-                                            comment.rebuild((b) => b..content = updatedContent);
-                                            await _updateGameRatingAnswer(
-                                                rating.id!, comment.id!, updatedAnswer);
-                                          }
-                                        },
-                                      ),
-                                    IconButton(
-                                      icon: const Icon(Icons.thumb_up, color: Colors.green),
-                                      onPressed: () => _voteOnComment(comment.id!, true),
-                                    ),
-                                    Text('${votes.upvotes}'),
-                                    IconButton(
-                                      icon: const Icon(Icons.thumb_down, color: Colors.red),
-                                      onPressed: () => _voteOnComment(comment.id!, false),
-                                    ),
-                                    Text('${votes.downvotes}'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                );
-              }).toList(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          labelText: 'Dodaj komentarz',
-                          border: OutlineInputBorder(),
-                        ),
-                        onSubmitted: (content) => _addComment(rating.id!, content),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.send, color: Colors.blue),
-                      onPressed: () {
-                        final content = _contentController.text.trim();
-                        if (content.isNotEmpty) {
-                          _addComment(rating.id!, content);
-                          _contentController.clear();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+              const Text('Ocena:'),
+              const SizedBox(width: 8),
+              DropdownButton<int>(
+                value: _ratingValue,
+                items: List.generate(10, (index) => index + 1)
+                    .map((value) => DropdownMenuItem(
+                  value: value,
+                  child: Text('$value/10'),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _ratingValue = value!;
+                  });
+                },
               ),
             ],
-          );
-        }
-      },
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _contentController,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: 'Treść recenzji',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: _addRating,
+              child: const Text('Dodaj recenzję'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-
-
-  Widget _buildSortDropdown() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Recenzje gry'),
+      ),
+      body: Column(
         children: [
-          const Text('Sortuj według:'),
-          const SizedBox(width: 8),
-          DropdownButton<String>(
-            value: _selectedSort,
-            items: const [
-              DropdownMenuItem(value: 'createdAt_desc', child: Text('Najnowsze')),
-              DropdownMenuItem(value: 'createdAt_asc', child: Text('Najstarsze')),
-              DropdownMenuItem(value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
-              DropdownMenuItem(value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
-              DropdownMenuItem(value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
-              DropdownMenuItem(value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedSort = value!;
-                _ratings = BuiltList<GameRating>();
-                _currentPage = 0;
-                _hasMore = true;
-                _fetchRatings();
-              });
-            },
+          _buildSortDropdown(),
+          _buildAddRatingForm(),
+          Expanded(
+            child: _isLoading && (_ratings == null || _ratings!.isEmpty)
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage != null
+                ? Center(child: Text(_errorMessage!))
+                : _buildRatingsList(_ratings!),
           ),
         ],
       ),

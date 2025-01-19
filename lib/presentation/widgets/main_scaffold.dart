@@ -21,16 +21,20 @@ class MainScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Praca inżynierska'),
+        backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
-            icon: Icon(currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
+            icon: Icon(
+              currentTheme == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
+              color: Colors.white,
+            ),
             onPressed: () {
               onThemeChange(currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light);
             },
             tooltip: 'Przełącz motyw',
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
               final confirmed = await showDialog<bool>(
                 context: context,
@@ -60,22 +64,22 @@ class MainScaffold extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.deepPurple),
               child: Text(
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.person),
+              leading: const Icon(Icons.person, color: Colors.deepPurple),
               title: const Text('Profil'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/profile');
               },
             ),
             ListTile(
-              leading: const Icon(Icons.videogame_asset),
+              leading: const Icon(Icons.videogame_asset, color: Colors.deepPurple),
               title: const Text('Gry'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/games');
@@ -83,14 +87,14 @@ class MainScaffold extends StatelessWidget {
             ),
             if (isAdmin)
               ListTile(
-                leading: const Icon(Icons.admin_panel_settings),
+                leading: const Icon(Icons.admin_panel_settings, color: Colors.deepPurple),
                 title: const Text('Admin'),
                 onTap: () {
                   Navigator.pushReplacementNamed(context, '/admin');
                 },
               ),
             ListTile(
-              leading: const Icon(Icons.pie_chart),
+              leading: const Icon(Icons.pie_chart, color: Colors.deepPurple),
               title: const Text('Raporty'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/reports');

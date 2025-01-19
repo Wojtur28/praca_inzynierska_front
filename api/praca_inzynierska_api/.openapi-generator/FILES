@@ -12,6 +12,7 @@ doc/Genre.md
 doc/Platform.md
 doc/Report.md
 doc/ReportApi.md
+doc/ReportDetails.md
 doc/Screenshot.md
 doc/SteamGame.md
 doc/SteamGameDetail.md
@@ -50,6 +51,7 @@ lib/src/model/game_rating_answer.dart
 lib/src/model/genre.dart
 lib/src/model/platform.dart
 lib/src/model/report.dart
+lib/src/model/report_details.dart
 lib/src/model/screenshot.dart
 lib/src/model/steam_game.dart
 lib/src/model/steam_game_detail.dart
