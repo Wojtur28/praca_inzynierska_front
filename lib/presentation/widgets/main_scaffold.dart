@@ -100,6 +100,13 @@ class MainScaffold extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, '/reports');
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.library_books, color: Colors.deepPurple),
+              title: const Text('Biblioteka'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/library');
+              },
+            ),
           ],
         ),
       ),

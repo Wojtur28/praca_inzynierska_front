@@ -1,10 +1,11 @@
-// Openapi Generator last run: : 2025-01-19T10:05:48.693031
+// Openapi Generator last run: : 2025-01-21T20:10:45.985770
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/library_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/profile_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
@@ -96,63 +97,66 @@ class _MyAppState extends State<MyApp> {
             '/signup': (context) =>
                 SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
             '/games': (context) => ValueListenableBuilder<bool>(
-              valueListenable: isAdminNotifier,
-              builder: (context, isAdmin, child) {
-                return MainScaffold(
-                  isAdmin: isAdmin,
-                  currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
-                  onLogout: () async {
-                    await widget.authRepository.logout();
-                    isAdminNotifier.value = false;
-                    Navigator.pushReplacementNamed(context, '/signin');
+                  valueListenable: isAdminNotifier,
+                  builder: (context, isAdmin, child) {
+                    return MainScaffold(
+                      isAdmin: isAdmin,
+                      currentTheme: _themeNotifier.value,
+                      onThemeChange: (newTheme) =>
+                          _themeNotifier.value = newTheme,
+                      onLogout: () async {
+                        await widget.authRepository.logout();
+                        isAdminNotifier.value = false;
+                        Navigator.pushReplacementNamed(context, '/signin');
+                      },
+                      body: GamesPage(
+                        dio: widget.dio,
+                        themeNotifier: _themeNotifier,
+                        authRepository: widget.authRepository,
+                      ),
+                    );
                   },
-                  body: GamesPage(
-                    dio: widget.dio,
-                    themeNotifier: _themeNotifier,
-                    authRepository: widget.authRepository,
-                  ),
-                );
-              },
-            ),
+                ),
             '/admin': (context) => ValueListenableBuilder<bool>(
-              valueListenable: isAdminNotifier,
-              builder: (context, isAdmin, child) {
-                return MainScaffold(
-                  isAdmin: isAdmin,
-                  currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
-                  onLogout: () async {
-                    await widget.authRepository.logout();
-                    isAdminNotifier.value = false;
-                    Navigator.pushReplacementNamed(context, '/signin');
+                  valueListenable: isAdminNotifier,
+                  builder: (context, isAdmin, child) {
+                    return MainScaffold(
+                      isAdmin: isAdmin,
+                      currentTheme: _themeNotifier.value,
+                      onThemeChange: (newTheme) =>
+                          _themeNotifier.value = newTheme,
+                      onLogout: () async {
+                        await widget.authRepository.logout();
+                        isAdminNotifier.value = false;
+                        Navigator.pushReplacementNamed(context, '/signin');
+                      },
+                      body: AdminPanelPage(
+                        dio: widget.dio,
+                        userApi: widget.userApi,
+                      ),
+                    );
                   },
-                  body: AdminPanelPage(
-                    dio: widget.dio,
-                    userApi: widget.userApi,
-                  ),
-                );
-              },
-            ),
+                ),
             '/profile': (context) => ValueListenableBuilder<bool>(
-              valueListenable: isAdminNotifier,
-              builder: (context, isAdmin, child) {
-                return MainScaffold(
-                  isAdmin: isAdmin,
-                  currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
-                  onLogout: () async {
-                    await widget.authRepository.logout();
-                    isAdminNotifier.value = false;
-                    Navigator.pushReplacementNamed(context, '/signin');
+                  valueListenable: isAdminNotifier,
+                  builder: (context, isAdmin, child) {
+                    return MainScaffold(
+                      isAdmin: isAdmin,
+                      currentTheme: _themeNotifier.value,
+                      onThemeChange: (newTheme) =>
+                          _themeNotifier.value = newTheme,
+                      onLogout: () async {
+                        await widget.authRepository.logout();
+                        isAdminNotifier.value = false;
+                        Navigator.pushReplacementNamed(context, '/signin');
+                      },
+                      body: ProfilePage(
+                        dio: widget.dio,
+                        userApi: widget.userApi,
+                      ),
+                    );
                   },
-                  body: ProfilePage(
-                    dio: widget.dio,
-                    userApi: widget.userApi,
-                  ),
-                );
-              },
-            ),
+                ),
             '/reports': (context) => ValueListenableBuilder<bool>(
               valueListenable: isAdminNotifier,
               builder: (context, isAdmin, child) {
@@ -168,6 +172,24 @@ class _MyAppState extends State<MyApp> {
                   body: ReportsPage(
                     dio: widget.dio,
                     reportApi: ReportApi(widget.dio, standardSerializers),
+                  ),
+                );
+              },
+            ),
+            '/library': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  body: LibraryPage(
+                      dio: widget.dio
                   ),
                 );
               },

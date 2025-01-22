@@ -61,6 +61,19 @@ class _GamesPageContentState extends State<GamesPageContent> {
     }
   }
 
+  Future<void> _addToLibrary(String steamGameId) async {
+    try {
+      final libraryItemApi = LibraryApi(widget.dio, standardSerializers);
+      final createLibraryItem = CreateLibraryItem((b) => b
+        ..steamGameId = steamGameId
+        ..gameStatus = CreateLibraryItemGameStatusEnum.NOT_STARTED);
+      final response = await libraryItemApi.addLibraryItem(createLibraryItem: createLibraryItem);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gra dodana do biblioteki')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas dodawania do biblioteki: $e')));
+    }
+  }
+
   Future<void> _fetchGames() async {
     setState(() {
       _isLoading = true;
@@ -234,15 +247,12 @@ class _GamesPageContentState extends State<GamesPageContent> {
   }
 
   Widget _buildGameCard(SteamGameWithDetails game) {
-    final categories = (game.categories?.map((c) => c.name).toList() ?? [])
-        .take(3)
-        .join(', ');
-    final genres = (game.genres?.map((g) => g.name).toList() ?? [])
-        .take(3)
-        .join(', ');
-    final platforms = (game.platforms?.map((p) => p.name).toList() ?? [])
-        .take(3)
-        .join(', ');
+    final List<String?> categories = game.categories?.map((c) => c.name).toList() ?? <String>[];
+    final String categoriesText = categories.take(3).join(', ');
+    final List<String?> genres = game.genres?.map((g) => g.name).toList() ?? <String>[];
+    final String genresText = genres.take(3).join(', ');
+    final List<String?> platformsList = game.platforms?.map((p) => p.name).toList() ?? <String>[];
+    final String platformsText = platformsList.take(3).join(', ');
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
@@ -250,16 +260,32 @@ class _GamesPageContentState extends State<GamesPageContent> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              game.headerImage ?? '',
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.broken_image, size: 50),
-            ),
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.network(
+                  game.headerImage ?? '',
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 50),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white70,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.library_add, size: 20, color: Colors.deepPurple),
+                    onPressed: () => _addToLibrary(game.id!),
+                    tooltip: 'Dodaj do biblioteki',
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -276,17 +302,14 @@ class _GamesPageContentState extends State<GamesPageContent> {
                 Text('Cena na premierę: \$${game.launchPrice ?? 'N/A'}',
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 12),
-                if (categories.isNotEmpty)
-                  Text('Kategorie: $categories',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                if (categoriesText.isNotEmpty)
+                  Text('Kategorie: $categoriesText', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
-                if (genres.isNotEmpty)
-                  Text('Gatunki: $genres',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                if (genresText.isNotEmpty)
+                  Text('Gatunki: $genresText', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
-                if (platforms.isNotEmpty)
-                  Text('Platformy: $platforms',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                if (platformsText.isNotEmpty)
+                  Text('Platformy: $platformsText', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
                 _buildReviewSentiment(game),
               ],
@@ -302,16 +325,11 @@ class _GamesPageContentState extends State<GamesPageContent> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RatingsPage(
-                            dio: widget.dio,
-                            gameId: game.id!,
-                          ),
+                          builder: (context) => RatingsPage(dio: widget.dio, gameId: game.id!),
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
+                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
                     child: const Text('Recenzje'),
                   ),
                 ),
@@ -321,9 +339,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                     onPressed: () {
                       _showGameDetails(context, game);
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
+                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
                     child: const Text('Szczegóły'),
                   ),
                 ),
@@ -334,6 +350,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
       ),
     );
   }
+
 
 
   Widget _buildReviewSentiment(SteamGameWithDetails game) {
