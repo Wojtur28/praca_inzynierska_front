@@ -6,6 +6,7 @@ class MainScaffold extends StatelessWidget {
   final VoidCallback onLogout;
   final ValueChanged<ThemeMode> onThemeChange;
   final ThemeMode currentTheme;
+  final String appBarTitle;
 
   const MainScaffold({
     super.key,
@@ -14,13 +15,14 @@ class MainScaffold extends StatelessWidget {
     required this.onLogout,
     required this.onThemeChange,
     required this.currentTheme,
+    required this.appBarTitle,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Praca inżynierska'),
+        title: Text(appBarTitle),
         backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
@@ -29,7 +31,9 @@ class MainScaffold extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              onThemeChange(currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light);
+              onThemeChange(
+                currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
+              );
             },
             tooltip: 'Przełącz motyw',
           ),
@@ -98,6 +102,13 @@ class MainScaffold extends StatelessWidget {
               title: const Text('Raporty'),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/reports');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.library_books, color: Colors.deepPurple),
+              title: const Text('Biblioteka'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/library');
               },
             ),
           ],

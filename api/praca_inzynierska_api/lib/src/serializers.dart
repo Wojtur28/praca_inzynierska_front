@@ -17,9 +17,13 @@ import 'package:praca_inzynierska_api/src/model/date.dart';
 import 'package:praca_inzynierska_api/src/model/category.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating_answer.dart';
+import 'package:praca_inzynierska_api/src/model/create_library.dart';
+import 'package:praca_inzynierska_api/src/model/create_library_item.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
+import 'package:praca_inzynierska_api/src/model/library_item.dart';
+import 'package:praca_inzynierska_api/src/model/model_library.dart';
 import 'package:praca_inzynierska_api/src/model/platform.dart';
 import 'package:praca_inzynierska_api/src/model/report.dart';
 import 'package:praca_inzynierska_api/src/model/report_details.dart';
@@ -29,6 +33,7 @@ import 'package:praca_inzynierska_api/src/model/steam_game_detail.dart';
 import 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 import 'package:praca_inzynierska_api/src/model/steam_review.dart';
 import 'package:praca_inzynierska_api/src/model/steam_user.dart';
+import 'package:praca_inzynierska_api/src/model/update_library_item.dart';
 import 'package:praca_inzynierska_api/src/model/user.dart';
 import 'package:praca_inzynierska_api/src/model/vote.dart';
 import 'package:praca_inzynierska_api/src/model/vote_count.dart';
@@ -39,9 +44,13 @@ part 'serializers.g.dart';
   Category,
   CreateGameRating,
   CreateGameRatingAnswer,
+  CreateLibrary,
+  CreateLibraryItem,
   GameRating,
   GameRatingAnswer,
   Genre,
+  LibraryItem,
+  ModelLibrary,
   Platform,
   Report,
   ReportDetails,
@@ -52,6 +61,7 @@ part 'serializers.g.dart';
   SteamGameWithDetails,
   SteamReview,
   SteamUser,
+  UpdateLibraryItem,
   User,
   Vote,
   VoteCount,

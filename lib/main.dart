@@ -1,10 +1,11 @@
-// Openapi Generator last run: : 2025-01-19T10:05:48.693031
+// Openapi Generator last run: : 2025-01-24T07:08:27.350255
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/library_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/profile_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
@@ -101,12 +102,14 @@ class _MyAppState extends State<MyApp> {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onThemeChange: (newTheme) =>
+                  _themeNotifier.value = newTheme,
                   onLogout: () async {
                     await widget.authRepository.logout();
                     isAdminNotifier.value = false;
                     Navigator.pushReplacementNamed(context, '/signin');
                   },
+                  appBarTitle: 'Gry',
                   body: GamesPage(
                     dio: widget.dio,
                     themeNotifier: _themeNotifier,
@@ -121,12 +124,14 @@ class _MyAppState extends State<MyApp> {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onThemeChange: (newTheme) =>
+                  _themeNotifier.value = newTheme,
                   onLogout: () async {
                     await widget.authRepository.logout();
                     isAdminNotifier.value = false;
                     Navigator.pushReplacementNamed(context, '/signin');
                   },
+                  appBarTitle: 'Admin',
                   body: AdminPanelPage(
                     dio: widget.dio,
                     userApi: widget.userApi,
@@ -140,12 +145,14 @@ class _MyAppState extends State<MyApp> {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onThemeChange: (newTheme) =>
+                  _themeNotifier.value = newTheme,
                   onLogout: () async {
                     await widget.authRepository.logout();
                     isAdminNotifier.value = false;
                     Navigator.pushReplacementNamed(context, '/signin');
                   },
+                  appBarTitle: 'Profil',
                   body: ProfilePage(
                     dio: widget.dio,
                     userApi: widget.userApi,
@@ -159,15 +166,37 @@ class _MyAppState extends State<MyApp> {
                 return MainScaffold(
                   isAdmin: isAdmin,
                   currentTheme: _themeNotifier.value,
-                  onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                  onThemeChange: (newTheme) =>
+                  _themeNotifier.value = newTheme,
                   onLogout: () async {
                     await widget.authRepository.logout();
                     isAdminNotifier.value = false;
                     Navigator.pushReplacementNamed(context, '/signin');
                   },
+                  appBarTitle: 'Raporty',
                   body: ReportsPage(
                     dio: widget.dio,
                     reportApi: ReportApi(widget.dio, standardSerializers),
+                  ),
+                );
+              },
+            ),
+            '/library': (context) => ValueListenableBuilder<bool>(
+              valueListenable: isAdminNotifier,
+              builder: (context, isAdmin, child) {
+                return MainScaffold(
+                  isAdmin: isAdmin,
+                  currentTheme: _themeNotifier.value,
+                  onThemeChange: (newTheme) =>
+                  _themeNotifier.value = newTheme,
+                  onLogout: () async {
+                    await widget.authRepository.logout();
+                    isAdminNotifier.value = false;
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  appBarTitle: 'Biblioteka',
+                  body: LibraryPage(
+                    dio: widget.dio,
                   ),
                 );
               },

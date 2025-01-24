@@ -2,6 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:dio/dio.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
+import '../../data/filter_options.dart';
+
 class GamesRepository {
   final SteamGamesApi _steamGamesApi;
 
@@ -20,8 +22,8 @@ class GamesRepository {
         page: page,
         size: size,
         platform: platform,
-        categories: categories != null ? BuiltList<String>(categories) : null,
-        genres: genres != null ? BuiltList<String>(genres) : null,
+        categories: categories != null ? BuiltList<String>.from(categories) : null,
+        genres: genres != null ? BuiltList<String>.from(genres) : null,
         search: search,
       );
 
@@ -35,4 +37,18 @@ class GamesRepository {
     }
   }
 
+  Future<List<String>> fetchAllCategories() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    return allCategories;
+  }
+
+  Future<List<String>> fetchAllGenres() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    return allGenres;
+  }
+
+  Future<List<String>> fetchAllPlatforms() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    return platforms;
+  }
 }
