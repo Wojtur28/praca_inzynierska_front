@@ -45,15 +45,15 @@ class _LibraryPageState extends State<LibraryPage> {
       });
 
       if (library?.libraryItems != null) {
-        final gameIds = library!.libraryItems!
+        final steamGameIds = library!.libraryItems!
             .map((item) => item.steamGame?.id)
             .whereType<String>()
             .toList();
 
-        if (gameIds.isNotEmpty) {
+        if (steamGameIds.isNotEmpty) {
           final steamGamesApi = SteamGamesApi(widget.dio, standardSerializers);
           final detailResponse = await steamGamesApi.getSteamGamesWithDetails(
-            gameIds: BuiltList<String>(gameIds),
+            gameIds: BuiltList<String>(steamGameIds),
           );
 
           if (detailResponse.statusCode == 200 && detailResponse.data != null) {
@@ -80,14 +80,14 @@ class _LibraryPageState extends State<LibraryPage> {
     }
   }
 
-  Future<void> _updateGameStatus(String steamGameId, String newStatus) async {
+  Future<void> _updateGameStatus(String libraryItemId, String newStatus) async {
     try {
       final updateLibraryItem = UpdateLibraryItem(
             (b) => b..gameStatus = UpdateLibraryItemGameStatusEnum.valueOf(newStatus),
       );
       final libraryApi = LibraryApi(widget.dio, standardSerializers);
       await libraryApi.updateLibraryItemStatus(
-        steamGameId: steamGameId,
+        libraryItemId: libraryItemId,
         updateLibraryItem: updateLibraryItem,
       );
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +96,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
       setState(() {
         final index = library!.libraryItems!.indexWhere(
-              (item) => item.steamGame?.id == steamGameId,
+              (item) => item.id == libraryItemId,
         );
         if (index != -1) {
           final updatedItem = library!.libraryItems![index].rebuild(
@@ -104,12 +104,52 @@ class _LibraryPageState extends State<LibraryPage> {
           );
           library = library!.rebuild((b) => b..libraryItems[index] = updatedItem);
         }
-
-        // Nie aktualizuj gameDetails, ponieważ SteamGameWithDetails nie posiada gameStatus
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Błąd aktualizacji statusu gry: $e')),
+      );
+    }
+  }
+
+  Future<void> _deleteGame(String libraryItemId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Usuń grę'),
+        content: const Text('Czy na pewno chcesz usunąć tę grę z biblioteki?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Anuluj'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Usuń'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final libraryApi = LibraryApi(widget.dio, standardSerializers);
+      await libraryApi.deleteLibraryItem(
+        libraryItemId: libraryItemId,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gra została usunięta z biblioteki.')),
+      );
+
+      setState(() {
+        library = library!.rebuild(
+              (b) => b..libraryItems.removeWhere((item) => item.id == libraryItemId),
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Błąd usuwania gry: $e')),
       );
     }
   }
@@ -225,30 +265,48 @@ class _LibraryPageState extends State<LibraryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.2),
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                            child: imageUrl != null
-                                ? Image.network(
-                              imageUrl,
-                              width: double.infinity,
+                        Stack(
+                          children: [
+                            Container(
                               height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
+                              decoration: BoxDecoration(
+                                color: statusColor.withOpacity(0.2),
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                child: imageUrl != null
+                                    ? Image.network(
+                                  imageUrl,
+                                  width: double.infinity,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Center(
+                                      child: Icon(Icons.videogame_asset, size: 50, color: Colors.grey),
+                                    );
+                                  },
+                                )
+                                    : const Center(
                                   child: Icon(Icons.videogame_asset, size: 50, color: Colors.grey),
-                                );
-                              },
-                            )
-                                : const Center(
-                              child: Icon(Icons.videogame_asset, size: 50, color: Colors.grey),
+                                ),
+                              ),
                             ),
-                          ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white70,
+                                child: IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    _deleteGame(item.id!);
+                                  },
+                                  tooltip: 'Usuń grę',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -289,7 +347,7 @@ class _LibraryPageState extends State<LibraryPage> {
                             }).toList(),
                             onChanged: (newValue) {
                               if (newValue != null) {
-                                _updateGameStatus(game!.id!, newValue);
+                                _updateGameStatus(item.id!, newValue);
                               }
                             },
                             isExpanded: true,

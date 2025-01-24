@@ -27,6 +27,7 @@ doc/SteamReview.md
 doc/SteamReviewsApi.md
 doc/SteamUser.md
 doc/UpdateLibraryItem.md
+doc/UpdateUser.md
 doc/User.md
 doc/UserApi.md
 doc/Vote.md
@@ -70,6 +71,7 @@ lib/src/model/steam_game_with_details.dart
 lib/src/model/steam_review.dart
 lib/src/model/steam_user.dart
 lib/src/model/update_library_item.dart
+lib/src/model/update_user.dart
 lib/src/model/user.dart
 lib/src/model/vote.dart
 lib/src/model/vote_count.dart

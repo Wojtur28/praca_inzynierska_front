@@ -13,11 +13,11 @@ class GamesPageContent extends StatefulWidget {
   final dynamic authRepository;
 
   const GamesPageContent({
-    Key? key,
+    super.key,
     required this.dio,
     required this.themeNotifier,
     required this.authRepository,
-  }) : super(key: key);
+  });
 
   @override
   State<GamesPageContent> createState() => _GamesPageContentState();
@@ -480,9 +480,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
       drawer: MediaQuery.of(context).size.width <= 800
           ? _buildFilterPanel()
           : null,
-      appBar: AppBar(
-        title: const Text('Gry Steam'),
-      ),
       body: Row(
         children: [
           if (MediaQuery.of(context).size.width > 800) _buildFilterPanel(),

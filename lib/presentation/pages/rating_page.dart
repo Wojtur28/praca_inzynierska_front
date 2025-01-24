@@ -706,9 +706,6 @@ class _RatingsPageState extends State<RatingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recenzje gry'),
-      ),
       body: Column(
         children: [
           _buildSortDropdown(),

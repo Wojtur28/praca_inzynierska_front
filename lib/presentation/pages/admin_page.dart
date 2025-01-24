@@ -301,9 +301,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Panel Administratora - Zarządzanie Użytkownikami'),
-      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
