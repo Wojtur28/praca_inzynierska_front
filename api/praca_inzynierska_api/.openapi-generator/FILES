@@ -75,9 +75,3 @@ lib/src/model/vote.dart
 lib/src/model/vote_count.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/create_library_item_test.dart
-test/create_library_test.dart
-test/library_api_test.dart
-test/library_item_test.dart
-test/model_library_test.dart
-test/update_library_item_test.dart

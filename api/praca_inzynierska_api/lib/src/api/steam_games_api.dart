@@ -283,7 +283,7 @@ class SteamGamesApi {
     );
   }
 
-  /// Retrieve paginated list of Steam games with details
+  /// Retrieve paginated list of Steam games with details or details for specific game IDs
   ///
   ///
   /// Parameters:
@@ -293,6 +293,7 @@ class SteamGamesApi {
   /// * [categories]
   /// * [genres]
   /// * [search]
+  /// * [gameIds]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -309,6 +310,7 @@ class SteamGamesApi {
     BuiltList<String>? categories,
     BuiltList<String>? genres,
     String? search,
+    BuiltList<String>? gameIds,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -360,6 +362,13 @@ class SteamGamesApi {
       if (search != null)
         r'search':
             encodeQueryParameter(_serializers, search, const FullType(String)),
+      if (gameIds != null)
+        r'gameIds': encodeCollectionQueryParameter<String>(
+          _serializers,
+          gameIds,
+          const FullType(BuiltList, [FullType(String)]),
+          format: ListFormat.multi,
+        ),
     };
 
     final _response = await _dio.request<Object>(

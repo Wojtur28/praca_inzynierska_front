@@ -62,10 +62,6 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Profil użytkownika',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
                 const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.email),

@@ -433,9 +433,6 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Raporty'),
-      ),
       body: Stack(
         children: [
           isLoading
