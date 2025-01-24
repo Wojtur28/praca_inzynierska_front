@@ -123,6 +123,63 @@ class LibraryApi {
     );
   }
 
+  /// Delete a game from the current user&#39;s library
+  ///
+  ///
+  /// Parameters:
+  /// * [libraryItemId] - ID of the library item to delete from the library
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> deleteLibraryItem({
+    required String libraryItemId,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/library/items/{libraryItemId}'.replaceAll(
+        '{' r'libraryItemId' '}',
+        encodeQueryParameter(
+                _serializers, libraryItemId, const FullType(String))
+            .toString());
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearerAuth',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
+  }
+
   /// Retrieve the library for the current user (or create one if it does not exist)
   ///
   ///
@@ -207,7 +264,7 @@ class LibraryApi {
   ///
   ///
   /// Parameters:
-  /// * [steamGameId] - ID of the Steam game to update the status for
+  /// * [libraryItemId] - ID of the library item to update the status for
   /// * [updateLibraryItem] - Updated status for the library item
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
@@ -219,7 +276,7 @@ class LibraryApi {
   /// Returns a [Future] containing a [Response] with a [LibraryItem] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<LibraryItem>> updateLibraryItemStatus({
-    required String steamGameId,
+    required String libraryItemId,
     required UpdateLibraryItem updateLibraryItem,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -228,9 +285,10 @@ class LibraryApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/library/items/{steamGameId}'.replaceAll(
-        '{' r'steamGameId' '}',
-        encodeQueryParameter(_serializers, steamGameId, const FullType(String))
+    final _path = r'/library/items/{libraryItemId}'.replaceAll(
+        '{' r'libraryItemId' '}',
+        encodeQueryParameter(
+                _serializers, libraryItemId, const FullType(String))
             .toString());
     final _options = Options(
       method: r'PUT',

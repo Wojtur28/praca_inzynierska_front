@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-01-24T07:08:27.350255
+// Openapi Generator last run: : 2025-01-24T09:39:39.021514
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
@@ -35,6 +35,8 @@ void main() async {
 
   final authRepository = AuthRepository(dio);
   final userApi = UserApi(dio, standardSerializers);
+  final libraryApi = LibraryApi(dio, standardSerializers);
+
 
   runApp(MyApp(
     initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
@@ -42,6 +44,7 @@ void main() async {
     navigatorKey: navigatorKey,
     authRepository: authRepository,
     userApi: userApi,
+    libraryApi: libraryApi,
   ));
 }
 
@@ -61,6 +64,7 @@ class MyApp extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final AuthRepository authRepository;
   final UserApi userApi;
+  final LibraryApi libraryApi;
 
   const MyApp({
     super.key,
@@ -69,6 +73,7 @@ class MyApp extends StatefulWidget {
     required this.navigatorKey,
     required this.authRepository,
     required this.userApi,
+    required this.libraryApi,
   });
 
   @override
@@ -156,6 +161,7 @@ class _MyAppState extends State<MyApp> {
                   body: ProfilePage(
                     dio: widget.dio,
                     userApi: widget.userApi,
+                    libraryApi: widget.libraryApi,
                   ),
                 );
               },

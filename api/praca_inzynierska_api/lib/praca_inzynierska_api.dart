@@ -39,6 +39,7 @@ export 'package:praca_inzynierska_api/src/model/steam_game_with_details.dart';
 export 'package:praca_inzynierska_api/src/model/steam_review.dart';
 export 'package:praca_inzynierska_api/src/model/steam_user.dart';
 export 'package:praca_inzynierska_api/src/model/update_library_item.dart';
+export 'package:praca_inzynierska_api/src/model/update_user.dart';
 export 'package:praca_inzynierska_api/src/model/user.dart';
 export 'package:praca_inzynierska_api/src/model/vote.dart';
 export 'package:praca_inzynierska_api/src/model/vote_count.dart';

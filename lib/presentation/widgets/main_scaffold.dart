@@ -24,6 +24,7 @@ class MainScaffold extends StatelessWidget {
       appBar: AppBar(
         title: Text(appBarTitle),
         backgroundColor: Colors.deepPurple,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(
