@@ -4,11 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../widgets/main_scaffold.dart';
+
 class GameDetailsPage extends StatefulWidget {
   final Dio dio;
   final String gameId;
+  final VoidCallback onLogout;
+  final ValueChanged<ThemeMode> onThemeChange;
+  final ThemeMode currentTheme;
 
-  const GameDetailsPage({super.key, required this.dio, required this.gameId});
+  const GameDetailsPage({
+    super.key,
+    required this.dio,
+    required this.gameId,
+    required this.onLogout,
+    required this.onThemeChange,
+    required this.currentTheme,
+  });
 
   @override
   State<GameDetailsPage> createState() => _GameDetailsPageState();
@@ -48,20 +60,6 @@ class _GameDetailsPageState extends State<GameDetailsPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Szczegóły gry'),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-          ? Center(child: Text(_errorMessage!))
-          : _buildDetails(),
-    );
-  }
-
   Widget _buildDetails() {
     if (_game == null || _gameDetail == null) {
       return const Center(child: Text('Nie znaleziono szczegółów gry.'));
@@ -73,53 +71,80 @@ class _GameDetailsPageState extends State<GameDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_gameDetail!.screenshots != null && _gameDetail!.screenshots!.isNotEmpty)
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                CarouselSlider(
-                  items: _gameDetail!.screenshots!.map((screenshot) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            screenshot.pathThumbnail!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image, size: 100),
-                          ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                double maxWidth = constraints.maxWidth * 0.8;
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CarouselSlider(
+                      items: _gameDetail!.screenshots!.map((screenshot) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                width: maxWidth,
+                                child: Image.network(
+                                  screenshot.pathThumbnail!,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.broken_image, size: 50),
+                                ),
+                              ),
+                            );
+                          },
                         );
-                      },
-                    );
-                  }).toList(),
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    height: 300,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                  ),
-                ),
-                Positioned(
-                  left: 16,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, size: 32),
-                    onPressed: () => _carouselController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
+                      }).toList(),
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                        height: 300,
+                        autoPlay: true,
+                        enlargeCenterPage: true,
+                        viewportFraction: 0.8,
+                        aspectRatio: 16 / 9,
+                        enableInfiniteScroll: false,
+                      ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  right: 16,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_forward, size: 32),
-                    onPressed: () => _carouselController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
+                    Positioned(
+                      left: 16,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back, size: 32),
+                          color: Colors.deepPurple,
+                          onPressed: () => _carouselController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          ),
+                          tooltip: 'Poprzednia strona',
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                    Positioned(
+                      right: 16,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_forward, size: 32),
+                          color: Colors.deepPurple,
+                          onPressed: () => _carouselController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          ),
+                          tooltip: 'Następna strona',
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           const SizedBox(height: 16),
           Text(
@@ -237,5 +262,28 @@ class _GameDetailsPageState extends State<GameDetailsPage> {
     } else {
       throw 'Nie można otworzyć URL: $url';
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainScaffold(
+      appBarTitle: 'Szczegóły gry',
+      isAdmin: true,
+      onLogout: widget.onLogout,
+      onThemeChange: widget.onThemeChange,
+      currentTheme: widget.currentTheme,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        tooltip: 'Cofnij',
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+          ? Center(child: Text(_errorMessage!))
+          : _buildDetails(),
+    );
   }
 }

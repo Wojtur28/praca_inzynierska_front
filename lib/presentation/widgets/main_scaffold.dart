@@ -7,6 +7,7 @@ class MainScaffold extends StatelessWidget {
   final ValueChanged<ThemeMode> onThemeChange;
   final ThemeMode currentTheme;
   final String appBarTitle;
+  final Widget? leading;
 
   const MainScaffold({
     super.key,
@@ -16,6 +17,7 @@ class MainScaffold extends StatelessWidget {
     required this.onThemeChange,
     required this.currentTheme,
     required this.appBarTitle,
+    this.leading,
   });
 
   @override
@@ -25,6 +27,7 @@ class MainScaffold extends StatelessWidget {
         title: Text(appBarTitle),
         backgroundColor: Colors.deepPurple,
         centerTitle: true,
+        leading: leading,
         actions: [
           IconButton(
             icon: Icon(
@@ -69,12 +72,26 @@ class MainScaffold extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.deepPurple),
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.videogame_asset, color: Colors.deepPurple),
+              title: const Text('Gry'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/games');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.library_books, color: Colors.deepPurple),
+              title: const Text('Biblioteka'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/library');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Colors.deepPurple),
@@ -84,10 +101,10 @@ class MainScaffold extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.videogame_asset, color: Colors.deepPurple),
-              title: const Text('Gry'),
+              leading: const Icon(Icons.pie_chart, color: Colors.deepPurple),
+              title: const Text('Raporty'),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/games');
+                Navigator.pushReplacementNamed(context, '/reports');
               },
             ),
             if (isAdmin)
@@ -98,20 +115,6 @@ class MainScaffold extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/admin');
                 },
               ),
-            ListTile(
-              leading: const Icon(Icons.pie_chart, color: Colors.deepPurple),
-              title: const Text('Raporty'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/reports');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.library_books, color: Colors.deepPurple),
-              title: const Text('Biblioteka'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/library');
-              },
-            ),
           ],
         ),
       ),

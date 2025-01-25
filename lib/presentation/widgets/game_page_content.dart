@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/domain/repositories/games_repository.dart';
-import '../pages/game_details_page.dart';
+import '../../main.dart';
 import '../pages/rating_page.dart';
 import 'multi_select_chip.dart';
 
@@ -351,18 +351,18 @@ class _GamesPageContentState extends State<GamesPageContent> {
                 const SizedBox(height: 12),
                 if (categoriesText.isNotEmpty)
                   Text('Kategorie: $categoriesText',
-                      style:
-                      const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
                 if (genresText.isNotEmpty)
                   Text('Gatunki: $genresText',
-                      style:
-                      const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
                 if (platformsText.isNotEmpty)
                   Text('Platformy: $platformsText',
-                      style:
-                      const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 12),
                 _buildReviewSentiment(game),
               ],
@@ -380,7 +380,18 @@ class _GamesPageContentState extends State<GamesPageContent> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => RatingsPage(
-                              dio: widget.dio, gameId: game.id!),
+                            dio: widget.dio,
+                            gameId: game.id!,
+                            onLogout: () async {
+                              await widget.authRepository.logout();
+                              isAdminNotifier.value = false;
+                              Navigator.pushReplacementNamed(context, '/signin');
+                            },
+                            onThemeChange: (newTheme) {
+                              widget.themeNotifier.value = newTheme;
+                            },
+                            currentTheme: widget.themeNotifier.value,
+                          ),
                         ),
                       );
                     },
@@ -415,8 +426,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
                     ),
                     child: const Text(
                       'Szczegóły',
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -463,15 +474,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
   }
 
   void _showGameDetails(BuildContext context, SteamGameWithDetails game) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GameDetailsPage(
-          dio: widget.dio,
-          gameId: game.id!,
-        ),
-      ),
-    );
+    Navigator.pushNamed(context, '/game_details/${game.id}');
   }
 
   @override

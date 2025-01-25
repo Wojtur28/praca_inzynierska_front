@@ -9,7 +9,11 @@ import 'game_details_page.dart';
 
 class LibraryPage extends StatefulWidget {
   final Dio dio;
-  const LibraryPage({super.key, required this.dio});
+
+  const LibraryPage({
+    super.key,
+    required this.dio,
+  });
 
   @override
   _LibraryPageState createState() => _LibraryPageState();
@@ -175,9 +179,6 @@ class _LibraryPageState extends State<LibraryPage> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Biblioteka Gier'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -367,7 +368,15 @@ class _LibraryPageState extends State<LibraryPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => RatingsPage(
-                                            dio: widget.dio, gameId: game!.id!),
+                                          dio: widget.dio,
+                                          gameId: game!.id!,
+                                          onLogout: () async {
+                                            Navigator.pushReplacementNamed(context, '/signin');
+                                          },
+                                          onThemeChange: (newTheme) {
+                                          },
+                                          currentTheme: ThemeMode.light,
+                                        ),
                                       ),
                                     );
                                   },
@@ -381,8 +390,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                   ),
                                   child: const Text(
                                     'Recenzje',
-                                    style: TextStyle(
-                                        fontSize: 14, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -396,6 +404,9 @@ class _LibraryPageState extends State<LibraryPage> {
                                         builder: (context) => GameDetailsPage(
                                           dio: widget.dio,
                                           gameId: game!.id!,
+                                          onLogout: () {},
+                                          onThemeChange: (ThemeMode value) {},
+                                          currentTheme: ThemeMode.light,
                                         ),
                                       ),
                                     );
@@ -410,8 +421,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                   ),
                                   child: const Text(
                                     'Szczegóły',
-                                    style: TextStyle(
-                                        fontSize: 14, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),

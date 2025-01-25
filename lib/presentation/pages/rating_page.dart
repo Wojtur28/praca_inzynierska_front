@@ -1,17 +1,26 @@
-import 'dart:convert';
-
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
 import '../../data/auth_storage.dart';
+import '../widgets/main_scaffold.dart';
 
 class RatingsPage extends StatefulWidget {
   final Dio dio;
   final String gameId;
+  final VoidCallback onLogout;
+  final ValueChanged<ThemeMode> onThemeChange;
+  final ThemeMode currentTheme;
 
-  const RatingsPage({super.key, required this.dio, required this.gameId});
+  const RatingsPage({
+    super.key,
+    required this.dio,
+    required this.gameId,
+    required this.onLogout,
+    required this.onThemeChange,
+    required this.currentTheme,
+  });
 
   @override
   State<RatingsPage> createState() => _RatingsPageState();
@@ -48,29 +57,6 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<void> _initializeUser() async {
     final authStorage = AuthStorage();
     final token = await authStorage.getToken();
-
-    if (token != null) {
-      _currentUserId = _extractUserIdFromToken(token);
-      debugPrint('Extracted User ID: $_currentUserId');
-    } else {
-      debugPrint('No token found');
-    }
-  }
-
-  String? _extractUserIdFromToken(String jwt) {
-    try {
-      final parts = jwt.split('.');
-      if (parts.length != 3) return null;
-
-      final payload = parts[1];
-      final decoded = utf8.decode(base64Url.decode(base64Url.normalize(payload)));
-      final json = jsonDecode(decoded);
-      debugPrint('Decoded JWT Payload: $json');
-      return json['userId'];
-    } catch (e) {
-      debugPrint('Error extracting userId from token: $e');
-      return null;
-    }
   }
 
   void _onScroll() {
@@ -162,12 +148,10 @@ class _RatingsPageState extends State<RatingsPage> {
     }
   }
 
-  // Używamy ujednoliconego endpointu z parametrem votableType.
   Future<void> _voteOnRating(String ratingId, bool isUpvote) async {
     try {
       final vote = Vote((b) => b..voteType = isUpvote ? 'UP' : 'DOWN');
 
-      // Zakładamy, że VotesApi posiada metodę voteOnVotable
       final voteApi = VotesApi(widget.dio, standardSerializers);
       await voteApi.vote(
         votableType: 'RATING',
@@ -175,8 +159,8 @@ class _RatingsPageState extends State<RatingsPage> {
         vote: vote,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -190,7 +174,8 @@ class _RatingsPageState extends State<RatingsPage> {
             const SnackBar(content: Text('Już głosowałeś na tę recenzję!')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
+            content: Text(
+                'Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -209,8 +194,8 @@ class _RatingsPageState extends State<RatingsPage> {
         vote: vote,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
 
       setState(() {
         _ratings = BuiltList<GameRating>();
@@ -224,7 +209,8 @@ class _RatingsPageState extends State<RatingsPage> {
             const SnackBar(content: Text('Już głosowałeś na ten komentarz!')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
+            content: Text(
+                'Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -243,21 +229,20 @@ class _RatingsPageState extends State<RatingsPage> {
     try {
       final gameRatingAnswersApi =
       GameRatingAnswersApi(widget.dio, standardSerializers);
-      final createComment =
-      CreateGameRatingAnswer((b) => b..content = content);
+      final createComment = CreateGameRatingAnswer((b) => b..content = content);
 
       await gameRatingAnswersApi.createGameRatingAnswer(
         ratingId: ratingId,
         createGameRatingAnswer: createComment,
       );
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Komentarz został dodany')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Komentarz został dodany')));
 
-      setState(() {}); // Odświeżenie widoku – opcjonalnie możesz bardziej selektywnie aktualizować komentarze
+      setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')));
     }
   }
 
@@ -267,10 +252,10 @@ class _RatingsPageState extends State<RatingsPage> {
       GameRatingAnswersApi(widget.dio, standardSerializers);
       final response =
       await gameRatingAnswersApi.getGameRatingAnswers(ratingId: ratingId);
-      return response.data ?? BuiltList<GameRatingAnswer>();
+      return response.data ?? BuiltList();
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')));
       return BuiltList();
     }
   }
@@ -278,14 +263,15 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<VoteCount> _fetchVotesForRating(String ratingId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response =
-      await voteApi.getVoteCount(votableType: 'RATING', votableId: ratingId);
-      return response.data ?? VoteCount((b) => b
-        ..upvotes = 0
-        ..downvotes = 0);
+      final response = await voteApi.getVoteCount(
+          votableType: 'RATING', votableId: ratingId);
+      return response.data ??
+          VoteCount((b) => b
+            ..upvotes = 0
+            ..downvotes = 0);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas pobierania głosów dla recenzji: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Błąd podczas pobierania głosów dla recenzji: $e')));
       return VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
@@ -295,14 +281,15 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<VoteCount> _fetchVotesForAnswer(String answerId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response =
-      await voteApi.getVoteCount(votableType: 'ANSWER', votableId: answerId);
-      return response.data ?? VoteCount((b) => b
-        ..upvotes = 0
-        ..downvotes = 0);
+      final response = await voteApi.getVoteCount(
+          votableType: 'ANSWER', votableId: answerId);
+      return response.data ??
+          VoteCount((b) => b
+            ..upvotes = 0
+            ..downvotes = 0);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')));
       return VoteCount((b) => b
         ..upvotes = 0
         ..downvotes = 0);
@@ -328,10 +315,11 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')));
+          content: Text(
+              'Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
@@ -350,14 +338,16 @@ class _RatingsPageState extends State<RatingsPage> {
       setState(() {});
     } on DioError catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')));
+          content: Text(
+              'Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
-  Future<void> _updateGameRating(String gameId, String ratingId, GameRating updatedRating) async {
+  Future<void> _updateGameRating(
+      String gameId, String ratingId, GameRating updatedRating) async {
     try {
       final gameRatingsApi = GameRatingsApi(widget.dio, standardSerializers);
       await gameRatingsApi.updateGameRating(
@@ -377,11 +367,12 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nie możesz edytować recenzji innego użytkownika')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Nie możesz edytować recenzji innego użytkownika')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')));
+            content: Text(
+                'Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -389,9 +380,11 @@ class _RatingsPageState extends State<RatingsPage> {
     }
   }
 
-  Future<void> _updateGameRatingAnswer(String ratingId, String answerId, GameRatingAnswer updatedAnswer) async {
+  Future<void> _updateGameRatingAnswer(
+      String ratingId, String answerId, GameRatingAnswer updatedAnswer) async {
     try {
-      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
+      final gameRatingAnswersApi =
+      GameRatingAnswersApi(widget.dio, standardSerializers);
       await gameRatingAnswersApi.updateGameRatingAnswer(
         ratingId: ratingId,
         answerId: answerId,
@@ -409,11 +402,13 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nie możesz edytować odpowiedzi innego użytkownika')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content:
+            Text('Nie możesz edytować odpowiedzi innego użytkownika')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')));
+            content: Text(
+                'Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -421,7 +416,8 @@ class _RatingsPageState extends State<RatingsPage> {
     }
   }
 
-  Future<String?> _showEditDialog(BuildContext context, String initialContent) async {
+  Future<String?> _showEditDialog(
+      BuildContext context, String initialContent) async {
     final controller = TextEditingController(text: initialContent);
 
     return showDialog<String>(
@@ -445,8 +441,8 @@ class _RatingsPageState extends State<RatingsPage> {
               onPressed: () {
                 final content = controller.text.trim();
                 if (content.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Treść nie może być pusta')));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Treść nie może być pusta')));
                 } else {
                   Navigator.pop(context, content);
                 }
@@ -469,12 +465,18 @@ class _RatingsPageState extends State<RatingsPage> {
           DropdownButton<String>(
             value: _selectedSort,
             items: const [
-              DropdownMenuItem(value: 'createdAt_desc', child: Text('Najnowsze')),
-              DropdownMenuItem(value: 'createdAt_asc', child: Text('Najstarsze')),
-              DropdownMenuItem(value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
-              DropdownMenuItem(value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
-              DropdownMenuItem(value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
-              DropdownMenuItem(value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
+              DropdownMenuItem(
+                  value: 'createdAt_desc', child: Text('Najnowsze')),
+              DropdownMenuItem(
+                  value: 'createdAt_asc', child: Text('Najstarsze')),
+              DropdownMenuItem(
+                  value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
+              DropdownMenuItem(
+                  value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
+              DropdownMenuItem(
+                  value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
+              DropdownMenuItem(
+                  value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
             ],
             onChanged: (value) {
               setState(() {
@@ -496,158 +498,200 @@ class _RatingsPageState extends State<RatingsPage> {
       return const Center(child: Text('Brak recenzji do wyświetlenia'));
     }
     return ListView.builder(
-      controller: _scrollController,
-      itemCount: ratings.length,
-      itemBuilder: (context, index) {
-        final rating = ratings[index];
-        final isOwner = rating.user?.id == _currentUserId;
+        controller: _scrollController,
+        itemCount: ratings.length,
+        itemBuilder: (context, index) {
+          final rating = ratings[index];
+          final isOwner = rating.user?.id == _currentUserId;
 
-        return FutureBuilder<VoteCount>(
-          future: _fetchVotesForRating(rating.id!),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Text('Błąd: ${snapshot.error}');
-            } else {
-              final votes = snapshot.data!;
+          return FutureBuilder<VoteCount>(
+            future: _fetchVotesForRating(rating.id!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text('Błąd: ${snapshot.error}');
+              } else {
+                final votes = snapshot.data!;
 
-              return ExpansionTile(
-                title: Text(rating.content ?? 'Brak treści'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Ocena: ${rating.rating}/10'),
-                    Text('Autor: ${rating.user?.email ?? "Nieznany"}'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            if (isOwner)
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.blue),
-                                    onPressed: () async {
-                                      final updatedContent = await _showEditDialog(context, rating.content ?? '');
-                                      if (updatedContent != null) {
-                                        final updatedRating = rating.rebuild((b) => b..content = updatedContent);
-                                        await _updateGameRating(widget.gameId, rating.id!, updatedRating);
-                                      }
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteRating(widget.gameId, rating.id!),
-                                  ),
-                                ],
+                return ExpansionTile(
+                  title: Text(rating.content ?? 'Brak treści'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Ocena: ${rating.rating}/10'),
+                      Text('Autor: ${rating.user?.email ?? "Nieznany"}'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              if (isOwner)
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.blue),
+                                      onPressed: () async {
+                                        final updatedContent =
+                                        await _showEditDialog(
+                                            context, rating.content ?? '');
+                                        if (updatedContent != null) {
+                                          final updatedRating = rating.rebuild(
+                                                  (b) =>
+                                              b..content = updatedContent);
+                                          await _updateGameRating(widget.gameId,
+                                              rating.id!, updatedRating);
+                                        }
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () => _deleteRating(
+                                          widget.gameId, rating.id!),
+                                    ),
+                                  ],
+                                ),
+                              IconButton(
+                                icon: const Icon(Icons.thumb_up,
+                                    color: Colors.green),
+                                onPressed: () =>
+                                    _voteOnRating(rating.id!, true),
                               ),
-                            IconButton(
-                              icon: const Icon(Icons.thumb_up, color: Colors.green),
-                              onPressed: () => _voteOnRating(rating.id!, true),
-                            ),
-                            Text('${votes.upvotes}'),
-                            IconButton(
-                              icon: const Icon(Icons.thumb_down, color: Colors.red),
-                              onPressed: () => _voteOnRating(rating.id!, false),
-                            ),
-                            Text('${votes.downvotes}'),
-                          ],
+                              Text('${votes.upvotes}'),
+                              IconButton(
+                                icon: const Icon(Icons.thumb_down,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    _voteOnRating(rating.id!, false),
+                              ),
+                              Text('${votes.downvotes}'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  children: [
+                    FutureBuilder<BuiltList<GameRatingAnswer>>(
+                      future: _fetchComments(rating.id!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Text('Błąd: ${snapshot.error}');
+                        } else {
+                          final comments = snapshot.data ?? BuiltList();
+                          return Column(
+                            children: comments.map((comment) {
+                              final isCommentOwner =
+                                  comment.createdBy == _currentUserId;
+
+                              return FutureBuilder<VoteCount>(
+                                future: _fetchVotesForAnswer(comment.id!),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Text('Błąd: ${snapshot.error}');
+                                  } else {
+                                    final commentVotes = snapshot.data!;
+                                    return ListTile(
+                                      title: Text(
+                                          comment.content ?? 'Brak treści'),
+                                      subtitle: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              if (isCommentOwner)
+                                                Row(
+                                                  children: [
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          Icons.edit,
+                                                          color: Colors.blue),
+                                                      onPressed: () async {
+                                                        final updatedContent =
+                                                        await _showEditDialog(
+                                                            context,
+                                                            comment.content ??
+                                                                '');
+                                                        if (updatedContent !=
+                                                            null) {
+                                                          final updatedAnswer =
+                                                          comment.rebuild(
+                                                                  (b) => b
+                                                                ..content =
+                                                                    updatedContent);
+                                                          await _updateGameRatingAnswer(
+                                                              rating.id!,
+                                                              comment.id!,
+                                                              updatedAnswer);
+                                                        }
+                                                      },
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red),
+                                                      onPressed: () =>
+                                                          _deleteComment(
+                                                              rating.id!,
+                                                              comment.id!),
+                                                    ),
+                                                  ],
+                                                ),
+                                              IconButton(
+                                                icon: const Icon(Icons.thumb_up,
+                                                    color: Colors.green),
+                                                onPressed: () => _voteOnComment(
+                                                    comment.id!, true),
+                                              ),
+                                              Text('${commentVotes.upvotes}'),
+                                              IconButton(
+                                                icon: const Icon(Icons.thumb_down,
+                                                    color: Colors.red),
+                                                onPressed: () => _voteOnComment(
+                                                    comment.id!, false),
+                                              ),
+                                              Text('${commentVotes.downvotes}'),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            }).toList(),
+                          );
+                        }
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Dodaj komentarz',
+                          border: OutlineInputBorder(),
                         ),
-                      ],
+                        onSubmitted: (content) =>
+                            _addComment(rating.id!, content),
+                      ),
                     ),
                   ],
-                ),
-                children: [
-                  FutureBuilder<BuiltList<GameRatingAnswer>>(
-                    future: _fetchComments(rating.id!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Text('Błąd: ${snapshot.error}');
-                      } else {
-                        final comments = snapshot.data ?? BuiltList();
-                        return Column(
-                          children: comments.map((comment) {
-                            final isCommentOwner = comment.createdBy == _currentUserId;
-
-                            return FutureBuilder<VoteCount>(
-                              future: _fetchVotesForAnswer(comment.id!),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Text('Błąd: ${snapshot.error}');
-                                } else {
-                                  final commentVotes = snapshot.data!;
-                                  return ListTile(
-                                    title: Text(comment.content ?? 'Brak treści'),
-                                    subtitle: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            if (isCommentOwner)
-                                              Row(
-                                                children: [
-                                                  IconButton(
-                                                    icon: const Icon(Icons.edit, color: Colors.blue),
-                                                    onPressed: () async {
-                                                      final updatedContent = await _showEditDialog(context, comment.content ?? '');
-                                                      if (updatedContent != null) {
-                                                        final updatedAnswer = comment.rebuild((b) => b..content = updatedContent);
-                                                        await _updateGameRatingAnswer(rating.id!, comment.id!, updatedAnswer);
-                                                      }
-                                                    },
-                                                  ),
-                                                  IconButton(
-                                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                                    onPressed: () => _deleteComment(rating.id!, comment.id!),
-                                                  ),
-                                                ],
-                                              ),
-                                            IconButton(
-                                              icon: const Icon(Icons.thumb_up, color: Colors.green),
-                                              onPressed: () => _voteOnComment(comment.id!, true),
-                                            ),
-                                            Text('${commentVotes.upvotes}'),
-                                            IconButton(
-                                              icon: const Icon(Icons.thumb_down, color: Colors.red),
-                                              onPressed: () => _voteOnComment(comment.id!, false),
-                                            ),
-                                            Text('${commentVotes.downvotes}'),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                            );
-                          }).toList(),
-                        );
-                      }
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Dodaj komentarz',
-                        border: OutlineInputBorder(),
-                      ),
-                      onSubmitted: (content) => _addComment(rating.id!, content),
-                    ),
-                  ),
-                ],
-              );
-            }
-          },
-        );
-      },
-    );
+                );
+              }
+            },
+          );
+        });
   }
 
   Widget _buildAddRatingForm() {
@@ -705,7 +749,19 @@ class _RatingsPageState extends State<RatingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MainScaffold(
+      appBarTitle: 'Recenzje',
+      isAdmin: true,
+      onLogout: widget.onLogout,
+      onThemeChange: widget.onThemeChange,
+      currentTheme: widget.currentTheme,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        tooltip: 'Cofnij',
+      ),
       body: Column(
         children: [
           _buildSortDropdown(),
