@@ -25,6 +25,7 @@ class GamesPageContent extends StatefulWidget {
 
 class _GamesPageContentState extends State<GamesPageContent> {
   late GamesRepository _gamesRepository;
+  late RecommendedGamesApi _recommendedGamesApi;
   List<SteamGameWithDetails> _games = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -48,7 +49,9 @@ class _GamesPageContentState extends State<GamesPageContent> {
   void initState() {
     super.initState();
     _gamesRepository = GamesRepository(widget.dio);
+    _recommendedGamesApi = RecommendedGamesApi(widget.dio, standardSerializers);
     _fetchAllFilters();
+    _fetchRecommendedGames();
     _fetchGames();
     _scrollController.addListener(_onScroll);
   }
@@ -60,10 +63,8 @@ class _GamesPageContentState extends State<GamesPageContent> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200 &&
-        !_isLoading &&
-        _hasMore) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&
+        !_isLoading && _hasMore) {
       _currentPage++;
       _fetchGames();
     }
@@ -85,11 +86,9 @@ class _GamesPageContentState extends State<GamesPageContent> {
         ..steamGameId = steamGameId
         ..gameStatus = CreateLibraryItemGameStatusEnum.NOT_STARTED);
       await libraryItemApi.addLibraryItem(createLibraryItem: createLibraryItem);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gra dodana do biblioteki')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gra dodana do biblioteki')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Błąd podczas dodawania do biblioteki: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas dodawania do biblioteki: $e')));
     }
   }
 
@@ -98,17 +97,14 @@ class _GamesPageContentState extends State<GamesPageContent> {
       _isLoading = true;
     });
     try {
-      final List<SteamGameWithDetails> newGames = await _gamesRepository
-          .fetchGamesWithDetails(
+      final List<SteamGameWithDetails> newGames = await _gamesRepository.fetchGamesWithDetails(
         page: _currentPage,
         size: _pageSize,
         platform: _selectedPlatform,
-        categories:
-        _selectedCategories.isNotEmpty ? _selectedCategories : null,
+        categories: _selectedCategories.isNotEmpty ? _selectedCategories : null,
         genres: _selectedGenres.isNotEmpty ? _selectedGenres : null,
         search: _searchQuery.isNotEmpty ? _searchQuery : null,
       );
-      debugPrint('Fetched ${newGames.length} games');
       setState(() {
         if (newGames.isEmpty) {
           _hasMore = false;
@@ -117,12 +113,30 @@ class _GamesPageContentState extends State<GamesPageContent> {
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas pobierania gier: $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas pobierania gier: $e')));
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchRecommendedGames() async {
+    setState(() {
+      _isRecommendedLoading = true;
+    });
+    try {
+      final response = await _recommendedGamesApi.getRecommendedGames();
+      final recommendedBuiltList = response.data;
+      setState(() {
+        _recommendedGames = recommendedBuiltList?.toList() ?? [];
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd podczas pobierania rekomendowanych gier: $e')));
+    } finally {
+      setState(() {
+        _isRecommendedLoading = false;
       });
     }
   }
@@ -144,8 +158,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
         _isFilterLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas pobierania filtrów: $e')),
-      );
+          SnackBar(content: Text('Błąd podczas pobierania filtrów: $e')));
     }
   }
 
@@ -156,10 +169,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
         child: _isFilterLoading
             ? const Center(child: CircularProgressIndicator())
             : _isFilterError
-            ? const Center(
-          child: Text(
-              'Nie udało się załadować filtrów. Spróbuj ponownie.'),
-        )
+            ? const Center(child: Text('Nie udało się załadować filtrów. Spróbuj ponownie.'))
             : ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
@@ -185,8 +195,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                     border: OutlineInputBorder(),
                   ),
                   items: _platforms
-                      .map((platform) => DropdownMenuItem(
-                      value: platform, child: Text(platform)))
+                      .map((platform) => DropdownMenuItem(value: platform, child: Text(platform)))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
@@ -276,9 +285,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
       itemCount: _games.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _games.length) {
-          return _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : const SizedBox();
+          return _isLoading ? const Center(child: CircularProgressIndicator()) : const SizedBox();
         }
         final game = _games[index];
         return _buildGameCard(game);
@@ -287,14 +294,11 @@ class _GamesPageContentState extends State<GamesPageContent> {
   }
 
   Widget _buildGameCard(SteamGameWithDetails game) {
-    final List<String?> categories =
-        game.categories?.map((c) => c.name).toList() ?? <String>[];
+    final List<String?> categories = game.categories?.map((c) => c.name).toList() ?? <String>[];
     final String categoriesText = categories.take(3).join(', ');
-    final List<String?> genres =
-        game.genres?.map((g) => g.name).toList() ?? <String>[];
+    final List<String?> genres = game.genres?.map((g) => g.name).toList() ?? <String>[];
     final String genresText = genres.take(3).join(', ');
-    final List<String?> platformsList =
-        game.platforms?.map((p) => p.name).toList() ?? <String>[];
+    final List<String?> platformsList = game.platforms?.map((p) => p.name).toList() ?? <String>[];
     final String platformsText = platformsList.take(3).join(', ');
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -305,15 +309,13 @@ class _GamesPageContentState extends State<GamesPageContent> {
           Stack(
             children: [
               ClipRRect(
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Image.network(
                   game.headerImage ?? '',
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 50),
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 50),
                 ),
               ),
               Positioned(
@@ -323,8 +325,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                   backgroundColor: Colors.white70,
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.library_add,
-                        size: 20, color: Colors.deepPurple),
+                    icon: const Icon(Icons.library_add, size: 20, color: Colors.deepPurple),
                     onPressed: () => _addToLibrary(game.id!),
                     tooltip: 'Dodaj do biblioteki',
                   ),
@@ -339,38 +340,32 @@ class _GamesPageContentState extends State<GamesPageContent> {
               children: [
                 Text(
                   game.title ?? 'Brak tytułu',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text('Cena na premierę: \$${game.launchPrice ?? 'N/A'}',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500)),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 12),
                 if (categoriesText.isNotEmpty)
                   Text('Kategorie: $categoriesText',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
                 if (genresText.isNotEmpty)
                   Text('Gatunki: $genresText',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 8),
                 if (platformsText.isNotEmpty)
                   Text('Platformy: $platformsText',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w400)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                 const SizedBox(height: 12),
                 _buildReviewSentiment(game),
               ],
             ),
           ),
           Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -405,8 +400,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                     ),
                     child: const Text(
                       'Recenzje',
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -426,8 +420,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                     ),
                     child: const Text(
                       'Szczegóły',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

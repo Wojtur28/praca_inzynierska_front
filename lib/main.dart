@@ -1,12 +1,14 @@
-// Openapi Generator last run: : 2025-01-24T09:39:39.021514
+// Openapi Generator last run: : 2025-02-16T17:14:35.971992
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 import 'package:praca_inzynierska_front/presentation/pages/admin_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_details_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/game_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/library_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/profile_page.dart';
+import 'package:praca_inzynierska_front/presentation/pages/recommend_game_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_in_page.dart';
 import 'package:praca_inzynierska_front/presentation/pages/sign_up_page.dart';
 import 'package:praca_inzynierska_front/presentation/widgets/main_scaffold.dart';
@@ -18,6 +20,8 @@ import 'presentation/pages/report_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final ValueNotifier<bool> isAdminNotifier = ValueNotifier<bool>(false);
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +42,7 @@ void main() async {
   final libraryApi = LibraryApi(dio, standardSerializers);
 
   runApp(MyApp(
-    initialRoute: token != null && token.isNotEmpty ? '/games' : '/signin',
+    initialRoute: token != null && token.isNotEmpty ? '/recommendations' : '/signin',
     dio: dio,
     navigatorKey: navigatorKey,
     authRepository: authRepository,
@@ -47,6 +51,16 @@ void main() async {
   ));
 }
 
+@Openapi(
+  additionalProperties: DioProperties(
+    pubName: 'praca_inzynierska_api',
+    pubAuthor: 'Maciej Wojturski',
+  ),
+  inputSpec: InputSpec(path: 'lib/contract/contract.yml'),
+  generatorName: Generator.dio,
+  runSourceGenOnOutput: true,
+  outputDirectory: 'api/praca_inzynierska_api',
+)
 class MyApp extends StatefulWidget {
   final String initialRoute;
   final Dio dio;
@@ -86,10 +100,29 @@ class _MyAppState extends State<MyApp> {
             themeMode: themeMode,
             initialRoute: widget.initialRoute,
             routes: {
-              '/signin': (context) =>
-                  SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
-              '/signup': (context) =>
-                  SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
+              '/signin': (context) => SignInPage(dio: widget.dio, themeNotifier: _themeNotifier),
+              '/signup': (context) => SignUpPage(dio: widget.dio, themeNotifier: _themeNotifier),
+              '/recommendations': (context) => ValueListenableBuilder<bool>(
+                valueListenable: isAdminNotifier,
+                builder: (context, isAdmin, child) {
+                  return MainScaffold(
+                    isAdmin: isAdmin,
+                    currentTheme: _themeNotifier.value,
+                    onThemeChange: (newTheme) => _themeNotifier.value = newTheme,
+                    onLogout: () async {
+                      await widget.authRepository.logout();
+                      isAdminNotifier.value = false;
+                      Navigator.pushReplacementNamed(context, '/signin');
+                    },
+                    appBarTitle: 'Rekomendacje',
+                    body: RecommendedGamesPage(
+                      dio: widget.dio,
+                      themeNotifier: _themeNotifier,
+                      authRepository: widget.authRepository,
+                    ),
+                  );
+                },
+              ),
               '/games': (context) => ValueListenableBuilder<bool>(
                 valueListenable: isAdminNotifier,
                 builder: (context, isAdmin, child) {
