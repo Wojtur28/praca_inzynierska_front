@@ -72,12 +72,22 @@ class MainScaffold extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.deepPurple),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+            Container(
+              height: 56,
+              decoration: const BoxDecoration(color: Colors.deepPurple),
+              child: const Center(
+                child: Text(
+                  'Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.star, color: Colors.deepPurple),
+              title: const Text('Rekomendacje'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/recommendations');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.videogame_asset, color: Colors.deepPurple),

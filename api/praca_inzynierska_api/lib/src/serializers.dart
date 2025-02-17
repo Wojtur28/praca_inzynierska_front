@@ -17,10 +17,12 @@ import 'package:praca_inzynierska_api/src/model/date.dart';
 import 'package:praca_inzynierska_api/src/model/category.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/create_game_rating_answer.dart';
+import 'package:praca_inzynierska_api/src/model/create_game_view.dart';
 import 'package:praca_inzynierska_api/src/model/create_library.dart';
 import 'package:praca_inzynierska_api/src/model/create_library_item.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating.dart';
 import 'package:praca_inzynierska_api/src/model/game_rating_answer.dart';
+import 'package:praca_inzynierska_api/src/model/game_view.dart';
 import 'package:praca_inzynierska_api/src/model/genre.dart';
 import 'package:praca_inzynierska_api/src/model/library_item.dart';
 import 'package:praca_inzynierska_api/src/model/model_library.dart';
@@ -45,10 +47,12 @@ part 'serializers.g.dart';
   Category,
   CreateGameRating,
   CreateGameRatingAnswer,
+  CreateGameView,
   CreateLibrary,
   CreateLibraryItem,
   GameRating,
   GameRatingAnswer,
+  GameView,
   Genre,
   LibraryItem,
   ModelLibrary,

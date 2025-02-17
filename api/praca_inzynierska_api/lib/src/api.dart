@@ -11,7 +11,9 @@ import 'package:praca_inzynierska_api/src/auth/bearer_auth.dart';
 import 'package:praca_inzynierska_api/src/auth/oauth.dart';
 import 'package:praca_inzynierska_api/src/api/game_rating_answers_api.dart';
 import 'package:praca_inzynierska_api/src/api/game_ratings_api.dart';
+import 'package:praca_inzynierska_api/src/api/game_views_api.dart';
 import 'package:praca_inzynierska_api/src/api/library_api.dart';
+import 'package:praca_inzynierska_api/src/api/recommended_games_api.dart';
 import 'package:praca_inzynierska_api/src/api/report_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_games_api.dart';
 import 'package:praca_inzynierska_api/src/api/steam_reviews_api.dart';
@@ -95,10 +97,22 @@ class PracaInzynierskaApi {
     return GameRatingsApi(dio, serializers);
   }
 
+  /// Get GameViewsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  GameViewsApi getGameViewsApi() {
+    return GameViewsApi(dio, serializers);
+  }
+
   /// Get LibraryApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   LibraryApi getLibraryApi() {
     return LibraryApi(dio, serializers);
+  }
+
+  /// Get RecommendedGamesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  RecommendedGamesApi getRecommendedGamesApi() {
+    return RecommendedGamesApi(dio, serializers);
   }
 
   /// Get ReportApi instance, base route and serializer can be overridden by a given but be careful,
