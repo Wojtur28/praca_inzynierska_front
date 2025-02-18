@@ -27,8 +27,10 @@ class _GamesPageContentState extends State<GamesPageContent> {
   late GamesRepository _gamesRepository;
   late RecommendedGamesApi _recommendedGamesApi;
   List<SteamGameWithDetails> _games = [];
+  List<SteamGame> _recommendedGames = [];
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _isRecommendedLoading = false;
   int _currentPage = 0;
   final int _pageSize = 10;
   final ScrollController _scrollController = ScrollController();
