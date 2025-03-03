@@ -12,6 +12,7 @@ class RatingsPage extends StatefulWidget {
   final VoidCallback onLogout;
   final ValueChanged<ThemeMode> onThemeChange;
   final ThemeMode currentTheme;
+  final bool isLoggedIn;
 
   const RatingsPage({
     super.key,
@@ -20,6 +21,7 @@ class RatingsPage extends StatefulWidget {
     required this.onLogout,
     required this.onThemeChange,
     required this.currentTheme,
+    required this.isLoggedIn,
   });
 
   @override
@@ -60,8 +62,7 @@ class _RatingsPageState extends State<RatingsPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200 &&
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&
         !_isLoading &&
         _hasMore) {
       _currentPage++;
@@ -74,7 +75,6 @@ class _RatingsPageState extends State<RatingsPage> {
       _isLoading = true;
       _errorMessage = null;
     });
-
     try {
       final gameRatingsApi = GameRatingsApi(widget.dio, standardSerializers);
       final response = await gameRatingsApi.getGameRatings(
@@ -83,7 +83,6 @@ class _RatingsPageState extends State<RatingsPage> {
         size: _pageSize,
         sort: _selectedSort,
       );
-
       setState(() {
         final newRatings = response.data ?? BuiltList<GameRating>();
         if (_ratings == null) {
@@ -106,41 +105,31 @@ class _RatingsPageState extends State<RatingsPage> {
 
   Future<void> _addRating() async {
     final content = _contentController.text.trim();
-
     if (content.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Treść recenzji nie może być pusta')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Treść recenzji nie może być pusta')));
       return;
     }
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       final gameRatingsApi = GameRatingsApi(widget.dio, standardSerializers);
       final createRating = CreateGameRating((b) => b
         ..rating = _ratingValue
         ..content = content);
-
       await gameRatingsApi.createGameRating(
         gameId: widget.gameId,
         createGameRating: createRating,
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Recenzja została dodana')));
-
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Recenzja została dodana')));
       _contentController.clear();
       _ratingValue = 5;
-
       _ratings = BuiltList<GameRating>();
       _currentPage = 0;
       _hasMore = true;
       _fetchRatings();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas dodawania recenzji: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas dodawania recenzji: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -151,17 +140,13 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<void> _voteOnRating(String ratingId, bool isUpvote) async {
     try {
       final vote = Vote((b) => b..voteType = isUpvote ? 'UP' : 'DOWN');
-
       final voteApi = VotesApi(widget.dio, standardSerializers);
       await voteApi.vote(
         votableType: 'RATING',
         votableId: ratingId,
         vote: vote,
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
-
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
       setState(() {
         _ratings = BuiltList<GameRating>();
         _currentPage = 0;
@@ -170,33 +155,25 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 409) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Już głosowałeś na tę recenzję!')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Już głosowałeś na tę recenzję!')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
   Future<void> _voteOnComment(String commentId, bool isUpvote) async {
     try {
       final vote = Vote((b) => b..voteType = isUpvote ? 'UP' : 'DOWN');
-
       final voteApi = VotesApi(widget.dio, standardSerializers);
       await voteApi.vote(
         votableType: 'ANSWER',
         votableId: commentId,
         vote: vote,
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
-
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isUpvote ? 'Głos dodany 👍' : 'Głos dodany 👎')));
       setState(() {
         _ratings = BuiltList<GameRating>();
         _currentPage = 0;
@@ -205,57 +182,41 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 409) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Już głosowałeś na ten komentarz!')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Już głosowałeś na ten komentarz!')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas głosowania: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
   Future<void> _addComment(String ratingId, String content) async {
     if (content.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Treść komentarza nie może być pusta')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Treść komentarza nie może być pusta')));
       return;
     }
-
     try {
-      final gameRatingAnswersApi =
-      GameRatingAnswersApi(widget.dio, standardSerializers);
+      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
       final createComment = CreateGameRatingAnswer((b) => b..content = content);
-
       await gameRatingAnswersApi.createGameRatingAnswer(
         ratingId: ratingId,
         createGameRatingAnswer: createComment,
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Komentarz został dodany')));
-
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Komentarz został dodany')));
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas dodawania komentarza: $e')));
     }
   }
 
   Future<BuiltList<GameRatingAnswer>> _fetchComments(String ratingId) async {
     try {
-      final gameRatingAnswersApi =
-      GameRatingAnswersApi(widget.dio, standardSerializers);
-      final response =
-      await gameRatingAnswersApi.getGameRatingAnswers(ratingId: ratingId);
+      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
+      final response = await gameRatingAnswersApi.getGameRatingAnswers(ratingId: ratingId);
       return response.data ?? BuiltList();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas pobierania komentarzy: $e')));
       return BuiltList();
     }
   }
@@ -263,50 +224,30 @@ class _RatingsPageState extends State<RatingsPage> {
   Future<VoteCount> _fetchVotesForRating(String ratingId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response = await voteApi.getVoteCount(
-          votableType: 'RATING', votableId: ratingId);
-      return response.data ??
-          VoteCount((b) => b
-            ..upvotes = 0
-            ..downvotes = 0);
+      final response = await voteApi.getVoteCount(votableType: 'RATING', votableId: ratingId);
+      return response.data ?? VoteCount((b) => b..upvotes = 0..downvotes = 0);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Błąd podczas pobierania głosów dla recenzji: $e')));
-      return VoteCount((b) => b
-        ..upvotes = 0
-        ..downvotes = 0);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas pobierania głosów dla recenzji: $e')));
+      return VoteCount((b) => b..upvotes = 0..downvotes = 0);
     }
   }
 
   Future<VoteCount> _fetchVotesForAnswer(String answerId) async {
     try {
       final voteApi = VotesApi(widget.dio, standardSerializers);
-      final response = await voteApi.getVoteCount(
-          votableType: 'ANSWER', votableId: answerId);
-      return response.data ??
-          VoteCount((b) => b
-            ..upvotes = 0
-            ..downvotes = 0);
+      final response = await voteApi.getVoteCount(votableType: 'ANSWER', votableId: answerId);
+      return response.data ?? VoteCount((b) => b..upvotes = 0..downvotes = 0);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')));
-      return VoteCount((b) => b
-        ..upvotes = 0
-        ..downvotes = 0);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas pobierania głosów dla odpowiedzi: $e')));
+      return VoteCount((b) => b..upvotes = 0..downvotes = 0);
     }
   }
 
   Future<void> _deleteRating(String gameId, String ratingId) async {
     try {
       final gameRatingsApi = GameRatingsApi(widget.dio, standardSerializers);
-      await gameRatingsApi.deleteGameRating(
-        gameId: gameId,
-        ratingId: ratingId,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Recenzja została usunięta')));
-
+      await gameRatingsApi.deleteGameRating(gameId: gameId, ratingId: ratingId);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Recenzja została usunięta')));
       setState(() {
         _ratings = BuiltList<GameRating>();
         _currentPage = 0;
@@ -314,51 +255,30 @@ class _RatingsPageState extends State<RatingsPage> {
       });
       await _fetchRatings();
     } on DioError catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas usuwania recenzji: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
   Future<void> _deleteComment(String ratingId, String commentId) async {
     try {
-      final gameRatingAnswersApi =
-      GameRatingAnswersApi(widget.dio, standardSerializers);
-      await gameRatingAnswersApi.deleteGameRatingAnswer(
-        ratingId: ratingId,
-        answerId: commentId,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Komentarz został usunięty')));
-
+      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
+      await gameRatingAnswersApi.deleteGameRatingAnswer(ratingId: ratingId, answerId: commentId);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Komentarz został usunięty')));
       setState(() {});
     } on DioError catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas usuwania komentarza: ${e.response?.data['error'] ?? e.message}')));
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
-  Future<void> _updateGameRating(
-      String gameId, String ratingId, GameRating updatedRating) async {
+  Future<void> _updateGameRating(String gameId, String ratingId, GameRating updatedRating) async {
     try {
       final gameRatingsApi = GameRatingsApi(widget.dio, standardSerializers);
-      await gameRatingsApi.updateGameRating(
-        gameId: gameId,
-        ratingId: ratingId,
-        gameRating: updatedRating,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Recenzja została zaktualizowana')));
-
+      await gameRatingsApi.updateGameRating(gameId: gameId, ratingId: ratingId, gameRating: updatedRating);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Recenzja została zaktualizowana')));
       setState(() {
         _ratings = BuiltList<GameRating>();
         _currentPage = 0;
@@ -367,33 +287,20 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Nie możesz edytować recenzji innego użytkownika')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nie możesz edytować recenzji innego użytkownika')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas aktualizacji recenzji: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
-  Future<void> _updateGameRatingAnswer(
-      String ratingId, String answerId, GameRatingAnswer updatedAnswer) async {
+  Future<void> _updateGameRatingAnswer(String ratingId, String answerId, GameRatingAnswer updatedAnswer) async {
     try {
-      final gameRatingAnswersApi =
-      GameRatingAnswersApi(widget.dio, standardSerializers);
-      await gameRatingAnswersApi.updateGameRatingAnswer(
-        ratingId: ratingId,
-        answerId: answerId,
-        gameRatingAnswer: updatedAnswer,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Odpowiedź została zaktualizowana')));
-
+      final gameRatingAnswersApi = GameRatingAnswersApi(widget.dio, standardSerializers);
+      await gameRatingAnswersApi.updateGameRatingAnswer(ratingId: ratingId, answerId: answerId, gameRatingAnswer: updatedAnswer);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Odpowiedź została zaktualizowana')));
       setState(() {
         _ratings = BuiltList<GameRating>();
         _currentPage = 0;
@@ -402,24 +309,17 @@ class _RatingsPageState extends State<RatingsPage> {
       await _fetchRatings();
     } on DioError catch (e) {
       if (e.response?.statusCode == 403) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content:
-            Text('Nie możesz edytować odpowiedzi innego użytkownika')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nie możesz edytować odpowiedzi innego użytkownika')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd podczas aktualizacji odpowiedzi: ${e.response?.data['error'] ?? e.message}')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nieoczekiwany błąd: $e')));
     }
   }
 
-  Future<String?> _showEditDialog(
-      BuildContext context, String initialContent) async {
+  Future<String?> _showEditDialog(BuildContext context, String initialContent) async {
     final controller = TextEditingController(text: initialContent);
-
     return showDialog<String>(
       context: context,
       builder: (context) {
@@ -441,8 +341,7 @@ class _RatingsPageState extends State<RatingsPage> {
               onPressed: () {
                 final content = controller.text.trim();
                 if (content.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Treść nie może być pusta')));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Treść nie może być pusta')));
                 } else {
                   Navigator.pop(context, content);
                 }
@@ -465,18 +364,12 @@ class _RatingsPageState extends State<RatingsPage> {
           DropdownButton<String>(
             value: _selectedSort,
             items: const [
-              DropdownMenuItem(
-                  value: 'createdAt_desc', child: Text('Najnowsze')),
-              DropdownMenuItem(
-                  value: 'createdAt_asc', child: Text('Najstarsze')),
-              DropdownMenuItem(
-                  value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
-              DropdownMenuItem(
-                  value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
-              DropdownMenuItem(
-                  value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
-              DropdownMenuItem(
-                  value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
+              DropdownMenuItem(value: 'createdAt_desc', child: Text('Najnowsze')),
+              DropdownMenuItem(value: 'createdAt_asc', child: Text('Najstarsze')),
+              DropdownMenuItem(value: 'votesUp_desc', child: Text('Najwięcej głosów 👍')),
+              DropdownMenuItem(value: 'votesUp_asc', child: Text('Najmniej głosów 👍')),
+              DropdownMenuItem(value: 'votesDown_desc', child: Text('Najwięcej głosów 👎')),
+              DropdownMenuItem(value: 'votesDown_asc', child: Text('Najmniej głosów 👎')),
             ],
             onChanged: (value) {
               setState(() {
@@ -503,7 +396,6 @@ class _RatingsPageState extends State<RatingsPage> {
         itemBuilder: (context, index) {
           final rating = ratings[index];
           final isOwner = rating.user?.id == _currentUserId;
-
           return FutureBuilder<VoteCount>(
             future: _fetchVotesForRating(rating.id!),
             builder: (context, snapshot) {
@@ -513,7 +405,6 @@ class _RatingsPageState extends State<RatingsPage> {
                 return Text('Błąd: ${snapshot.error}');
               } else {
                 final votes = snapshot.data!;
-
                 return ExpansionTile(
                   title: Text(rating.content ?? 'Brak treści'),
                   subtitle: Column(
@@ -530,41 +421,29 @@ class _RatingsPageState extends State<RatingsPage> {
                                 Row(
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.blue),
+                                      icon: const Icon(Icons.edit, color: Colors.blue),
                                       onPressed: () async {
-                                        final updatedContent =
-                                        await _showEditDialog(
-                                            context, rating.content ?? '');
+                                        final updatedContent = await _showEditDialog(context, rating.content ?? '');
                                         if (updatedContent != null) {
-                                          final updatedRating = rating.rebuild(
-                                                  (b) =>
-                                              b..content = updatedContent);
-                                          await _updateGameRating(widget.gameId,
-                                              rating.id!, updatedRating);
+                                          final updatedRating = rating.rebuild((b) => b..content = updatedContent);
+                                          await _updateGameRating(widget.gameId, rating.id!, updatedRating);
                                         }
                                       },
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
-                                      onPressed: () => _deleteRating(
-                                          widget.gameId, rating.id!),
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _deleteRating(widget.gameId, rating.id!),
                                     ),
                                   ],
                                 ),
                               IconButton(
-                                icon: const Icon(Icons.thumb_up,
-                                    color: Colors.green),
-                                onPressed: () =>
-                                    _voteOnRating(rating.id!, true),
+                                icon: const Icon(Icons.thumb_up, color: Colors.green),
+                                onPressed: () => _voteOnRating(rating.id!, true),
                               ),
                               Text('${votes.upvotes}'),
                               IconButton(
-                                icon: const Icon(Icons.thumb_down,
-                                    color: Colors.red),
-                                onPressed: () =>
-                                    _voteOnRating(rating.id!, false),
+                                icon: const Icon(Icons.thumb_down, color: Colors.red),
+                                onPressed: () => _voteOnRating(rating.id!, false),
                               ),
                               Text('${votes.downvotes}'),
                             ],
@@ -577,36 +456,28 @@ class _RatingsPageState extends State<RatingsPage> {
                     FutureBuilder<BuiltList<GameRatingAnswer>>(
                       future: _fetchComments(rating.id!),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
                           return Text('Błąd: ${snapshot.error}');
                         } else {
                           final comments = snapshot.data ?? BuiltList();
                           return Column(
                             children: comments.map((comment) {
-                              final isCommentOwner =
-                                  comment.createdBy == _currentUserId;
-
+                              final isCommentOwner = comment.createdBy == _currentUserId;
                               return FutureBuilder<VoteCount>(
                                 future: _fetchVotesForAnswer(comment.id!),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
                                     return Text('Błąd: ${snapshot.error}');
                                   } else {
                                     final commentVotes = snapshot.data!;
                                     return ListTile(
-                                      title: Text(
-                                          comment.content ?? 'Brak treści'),
+                                      title: Text(comment.content ?? 'Brak treści'),
                                       subtitle: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             children: [
@@ -614,52 +485,29 @@ class _RatingsPageState extends State<RatingsPage> {
                                                 Row(
                                                   children: [
                                                     IconButton(
-                                                      icon: const Icon(
-                                                          Icons.edit,
-                                                          color: Colors.blue),
+                                                      icon: const Icon(Icons.edit, color: Colors.blue),
                                                       onPressed: () async {
-                                                        final updatedContent =
-                                                        await _showEditDialog(
-                                                            context,
-                                                            comment.content ??
-                                                                '');
-                                                        if (updatedContent !=
-                                                            null) {
-                                                          final updatedAnswer =
-                                                          comment.rebuild(
-                                                                  (b) => b
-                                                                ..content =
-                                                                    updatedContent);
-                                                          await _updateGameRatingAnswer(
-                                                              rating.id!,
-                                                              comment.id!,
-                                                              updatedAnswer);
+                                                        final updatedContent = await _showEditDialog(context, comment.content ?? '');
+                                                        if (updatedContent != null) {
+                                                          final updatedAnswer = comment.rebuild((b) => b..content = updatedContent);
+                                                          await _updateGameRatingAnswer(rating.id!, comment.id!, updatedAnswer);
                                                         }
                                                       },
                                                     ),
                                                     IconButton(
-                                                      icon: const Icon(
-                                                          Icons.delete,
-                                                          color: Colors.red),
-                                                      onPressed: () =>
-                                                          _deleteComment(
-                                                              rating.id!,
-                                                              comment.id!),
+                                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                                      onPressed: () => _deleteComment(rating.id!, comment.id!),
                                                     ),
                                                   ],
                                                 ),
                                               IconButton(
-                                                icon: const Icon(Icons.thumb_up,
-                                                    color: Colors.green),
-                                                onPressed: () => _voteOnComment(
-                                                    comment.id!, true),
+                                                icon: const Icon(Icons.thumb_up, color: Colors.green),
+                                                onPressed: () => _voteOnComment(comment.id!, true),
                                               ),
                                               Text('${commentVotes.upvotes}'),
                                               IconButton(
-                                                icon: const Icon(Icons.thumb_down,
-                                                    color: Colors.red),
-                                                onPressed: () => _voteOnComment(
-                                                    comment.id!, false),
+                                                icon: const Icon(Icons.thumb_down, color: Colors.red),
+                                                onPressed: () => _voteOnComment(comment.id!, false),
                                               ),
                                               Text('${commentVotes.downvotes}'),
                                             ],
@@ -682,8 +530,7 @@ class _RatingsPageState extends State<RatingsPage> {
                           labelText: 'Dodaj komentarz',
                           border: OutlineInputBorder(),
                         ),
-                        onSubmitted: (content) =>
-                            _addComment(rating.id!, content),
+                        onSubmitted: (content) => _addComment(rating.id!, content),
                       ),
                     ),
                   ],
@@ -752,6 +599,7 @@ class _RatingsPageState extends State<RatingsPage> {
     return MainScaffold(
       appBarTitle: 'Recenzje',
       isAdmin: true,
+      isLoggedIn: widget.isLoggedIn,
       onLogout: widget.onLogout,
       onThemeChange: widget.onThemeChange,
       currentTheme: widget.currentTheme,

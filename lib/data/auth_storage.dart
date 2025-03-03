@@ -15,5 +15,4 @@ class AuthStorage {
   Future<void> clearToken() async {
     await _storage.delete(key: _tokenKey);
   }
-
 }
