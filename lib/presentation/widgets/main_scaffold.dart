@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MainScaffold extends StatelessWidget {
   final Widget body;
   final bool isAdmin;
+  final bool isLoggedIn;
   final VoidCallback onLogout;
   final ValueChanged<ThemeMode> onThemeChange;
   final ThemeMode currentTheme;
@@ -13,6 +14,7 @@ class MainScaffold extends StatelessWidget {
     super.key,
     required this.body,
     required this.isAdmin,
+    required this.isLoggedIn,
     required this.onLogout,
     required this.onThemeChange,
     required this.currentTheme,
@@ -35,38 +37,45 @@ class MainScaffold extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              onThemeChange(
-                currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light,
-              );
+              onThemeChange(currentTheme == ThemeMode.light ? ThemeMode.dark : ThemeMode.light);
             },
             tooltip: 'Przełącz motyw',
           ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Wylogowanie'),
-                  content: const Text('Czy na pewno chcesz się wylogować?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Anuluj'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Wyloguj'),
-                    ),
-                  ],
-                ),
-              );
-              if (confirmed == true) {
-                onLogout();
-              }
-            },
-            tooltip: 'Wyloguj się',
-          ),
+          if (!isLoggedIn)
+            IconButton(
+              icon: const Icon(Icons.login, color: Colors.white),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/signin');
+              },
+              tooltip: 'Zaloguj się',
+            ),
+          if (isLoggedIn)
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Wylogowanie'),
+                    content: const Text('Czy na pewno chcesz się wylogować?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Anuluj'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Wyloguj'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  onLogout();
+                }
+              },
+              tooltip: 'Wyloguj się',
+            ),
         ],
       ),
       drawer: Drawer(
@@ -76,18 +85,8 @@ class MainScaffold extends StatelessWidget {
               height: 56,
               decoration: const BoxDecoration(color: Colors.deepPurple),
               child: const Center(
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
+                child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.star, color: Colors.deepPurple),
-              title: const Text('Rekomendacje'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/recommendations');
-              },
             ),
             ListTile(
               leading: const Icon(Icons.videogame_asset, color: Colors.deepPurple),
@@ -96,27 +95,36 @@ class MainScaffold extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, '/games');
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.library_books, color: Colors.deepPurple),
-              title: const Text('Biblioteka'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/library');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person, color: Colors.deepPurple),
-              title: const Text('Profil'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/profile');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.pie_chart, color: Colors.deepPurple),
-              title: const Text('Raporty'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/reports');
-              },
-            ),
+            if (isLoggedIn) ...[
+              ListTile(
+                leading: const Icon(Icons.star, color: Colors.deepPurple),
+                title: const Text('Rekomendacje'),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/recommendations');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.library_books, color: Colors.deepPurple),
+                title: const Text('Biblioteka'),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/library');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person, color: Colors.deepPurple),
+                title: const Text('Profil'),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/profile');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.pie_chart, color: Colors.deepPurple),
+                title: const Text('Raporty'),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/reports');
+                },
+              ),
+            ],
             if (isAdmin)
               ListTile(
                 leading: const Icon(Icons.admin_panel_settings, color: Colors.deepPurple),

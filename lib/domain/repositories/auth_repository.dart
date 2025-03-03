@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:praca_inzynierska_api/praca_inzynierska_api.dart';
 
+import '../../main.dart';
 import '../models/sign_in_user.dart';
 import '../models/sign_up_user.dart';
 import '../../data/auth_storage.dart';
@@ -17,7 +18,6 @@ class AuthRepository {
       'email': user.email,
       'password': user.password,
     });
-
     if (response.statusCode == 200 && response.data != null) {
       final token = response.data['token'];
       if (token != null) {
@@ -27,6 +27,7 @@ class AuthRepository {
           orElse: () => throw StateError('BearerAuthInterceptor not found'),
         ) as BearerAuthInterceptor;
         bearerAuthInterceptor.tokens['bearerAuth'] = token;
+        isLoggedInNotifier.value = true;
         return true;
       }
     }
@@ -46,9 +47,7 @@ class AuthRepository {
         genderStr = 'OTHER';
         break;
     }
-
     final dob = user.dateOfBirth.toIso8601String().split('T')[0];
-
     final response = await _dio.post('/auth/signup', data: {
       'firstName': user.firstName,
       'lastName': user.lastName,
@@ -57,11 +56,9 @@ class AuthRepository {
       'gender': genderStr,
       'dateOfBirth': dob,
     });
-
     if (response.statusCode == 200) {
       return true;
     }
-
     return false;
   }
 
@@ -72,6 +69,7 @@ class AuthRepository {
       orElse: () => throw StateError('BearerAuthInterceptor not found'),
     ) as BearerAuthInterceptor;
     bearerAuthInterceptor.tokens.remove('bearerAuth');
+    isLoggedInNotifier.value = false;
   }
 
   Future<List<String>> getUserRoles() async {

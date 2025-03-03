@@ -12,6 +12,7 @@ class GameDetailsPage extends StatefulWidget {
   final VoidCallback onLogout;
   final ValueChanged<ThemeMode> onThemeChange;
   final ThemeMode currentTheme;
+  final bool isLoggedIn;
 
   const GameDetailsPage({
     super.key,
@@ -20,6 +21,7 @@ class GameDetailsPage extends StatefulWidget {
     required this.onLogout,
     required this.onThemeChange,
     required this.currentTheme,
+    required this.isLoggedIn,
   });
 
   @override
@@ -42,7 +44,7 @@ class _GameDetailsPageState extends State<GameDetailsPage> {
   }
 
   Future<void> _sendGameView() async {
-    if (_viewStartTime == null) return;
+    if (_viewStartTime == null || !widget.isLoggedIn) return;
     final duration = DateTime.now().difference(_viewStartTime!).inSeconds;
     final createGameView = CreateGameView((b) => b
       ..viewDuration = duration
@@ -69,6 +71,7 @@ class _GameDetailsPageState extends State<GameDetailsPage> {
         appBarTitle: 'Szczegóły gry',
         isAdmin: true,
         onLogout: widget.onLogout,
+        isLoggedIn: widget.isLoggedIn,
         onThemeChange: widget.onThemeChange,
         currentTheme: widget.currentTheme,
         leading: IconButton(

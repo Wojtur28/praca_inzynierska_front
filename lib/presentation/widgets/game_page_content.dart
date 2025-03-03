@@ -53,7 +53,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
     _gamesRepository = GamesRepository(widget.dio);
     _recommendedGamesApi = RecommendedGamesApi(widget.dio, standardSerializers);
     _fetchAllFilters();
-    _fetchRecommendedGames();
     _fetchGames();
     _scrollController.addListener(_onScroll);
   }
@@ -119,26 +118,6 @@ class _GamesPageContentState extends State<GamesPageContent> {
     } finally {
       setState(() {
         _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _fetchRecommendedGames() async {
-    setState(() {
-      _isRecommendedLoading = true;
-    });
-    try {
-      final response = await _recommendedGamesApi.getRecommendedGames();
-      final recommendedBuiltList = response.data;
-      setState(() {
-        _recommendedGames = recommendedBuiltList?.toList() ?? [];
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd podczas pobierania rekomendowanych gier: $e')));
-    } finally {
-      setState(() {
-        _isRecommendedLoading = false;
       });
     }
   }
@@ -388,6 +367,7 @@ class _GamesPageContentState extends State<GamesPageContent> {
                               widget.themeNotifier.value = newTheme;
                             },
                             currentTheme: widget.themeNotifier.value,
+                            isLoggedIn: true,
                           ),
                         ),
                       );

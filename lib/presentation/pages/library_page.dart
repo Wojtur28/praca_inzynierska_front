@@ -376,6 +376,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                           onThemeChange: (newTheme) {
                                           },
                                           currentTheme: ThemeMode.light,
+                                          isLoggedIn: true,
                                         ),
                                       ),
                                     );
@@ -407,6 +408,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                           onLogout: () {},
                                           onThemeChange: (ThemeMode value) {},
                                           currentTheme: ThemeMode.light,
+                                          isLoggedIn: true,
                                         ),
                                       ),
                                     );

@@ -70,14 +70,9 @@ class _SignInPageState extends State<SignInPage> {
         title: const Text('Logowanie'),
         actions: [
           IconButton(
-            icon: Icon(widget.themeNotifier.value == ThemeMode.light
-                ? Icons.dark_mode
-                : Icons.light_mode),
+            icon: Icon(widget.themeNotifier.value == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
             onPressed: () {
-              widget.themeNotifier.value =
-              widget.themeNotifier.value == ThemeMode.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light;
+              widget.themeNotifier.value = widget.themeNotifier.value == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
             },
           ),
         ],
@@ -87,9 +82,7 @@ class _SignInPageState extends State<SignInPage> {
           constraints: const BoxConstraints(maxWidth: 400),
           child: Card(
             margin: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -123,6 +116,12 @@ class _SignInPageState extends State<SignInPage> {
                       Navigator.pushReplacementNamed(context, '/signup');
                     },
                     child: const Text('Nie masz konta? Zarejestruj się.'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/games');
+                    },
+                    child: const Text('Lista gier'),
                   ),
                 ],
               ),
